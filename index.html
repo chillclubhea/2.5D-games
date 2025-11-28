@@ -2,201 +2,700 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>2.5D 像素跑酷 MVP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>呼吸訓練遊戲 | 屏息挑戰</title>
     <style>
         :root {
-            --game-width: 400px;
-            --game-height: 600px;
-            --road-height: 2000px; /* 模擬景深 */
-            --player-size: 40px;
+            --primary: #3498db;
+            --primary-light: #5dade2;
+            --primary-dark: #2980b9;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #f5f9fc;
+            --dark: #34495e;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        body {
+        
+        * {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            line-height: 1.6;
             min-height: 100vh;
-            background-color: #333;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            touch-action: none; /* 禁用瀏覽器預設觸控行為 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-
-        /* 遊戲主容器，設定視角 */
-        #game-container {
-            width: var(--game-width);
-            height: var(--game-height);
-            background: linear-gradient(#87CEEB, #AEC6CF); /* 天空背景 */
-            border: 5px solid #000;
-            overflow: hidden;
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .animation-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .controls-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .breathing-animation {
             position: relative;
-            /* 2.5D 核心：設置透視深度 */
-            perspective: 600px; 
-            transform-style: preserve-3d;
+            width: 100%;
+            height: 300px;
+            margin: 20px 0;
         }
-
-        /* 遊戲場景，應用 3D 旋轉 */
-        #game-view {
+        
+        .lung-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        
+        .lung {
+            position: absolute;
             width: 100%;
             height: 100%;
-            position: absolute;
-            transform-origin: bottom center;
-            /* 2.5D 核心：向後傾斜，模擬道路無限延伸 */
-            transform: rotateX(45deg); 
-            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30,20 Q50,5 70,20 Q85,30 85,50 Q85,70 70,80 Q50,95 30,80 Q15,70 15,50 Q15,30 30,20 Z" fill="rgba(255,255,255,0.7)" stroke="rgba(255,255,255,0.9)" stroke-width="2"/></svg>') no-repeat center;
+            background-size: contain;
+            transition: transform 0.5s ease-in-out;
         }
-
-        /* 道路 */
-        #road {
-            width: 100%;
-            height: var(--road-height);
-            background-color: #4CAF50; /* 草地 */
+        
+        .breath-dot {
             position: absolute;
-            bottom: 0;
-            /* 道路紋理/分割線 */
-            box-shadow: inset 0 0 0 5px #388E3C, 
-                        inset 0 100px 0 0 #A0A0A0; /* 模擬道路中央線 */
-            background-image: linear-gradient(to right, #66BB6A 50%, #4CAF50 50%);
-            background-size: 50px 100%;
-        }
-
-        /* 玩家角色 */
-        #player {
-            width: var(--player-size);
-            height: var(--player-size);
-            background-color: #FF5722; /* 橘色 */
-            position: absolute;
-            bottom: 0;
-            left: calc(50% - (var(--player-size) / 2));
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
-            /* 簡單的像素風外觀 */
-            border: 2px solid #000;
-            box-shadow: 2px 2px #000;
-            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+            transition: bottom 1s ease-in-out;
         }
-
-        /* 控制按鈕 (手機友好) */
-        #controls {
+        
+        .breath-path {
             position: absolute;
-            bottom: 10px;
-            width: 100%;
+            width: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            left: 50%;
+            transform: translateX(-50%);
+            top: 10%;
+            bottom: 10%;
+            border-radius: 2px;
+        }
+        
+        .instructions {
+            margin: 20px 0;
+            font-size: 1.2rem;
+            min-height: 60px;
             display: flex;
-            justify-content: space-around;
-            z-index: 20;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
         }
-
-        .ctrl-btn {
-            padding: 20px 40px;
-            font-size: 1.5em;
-            background-color: var(--ai-chat, #A855F7);
-            color: white;
-            border: none;
+        
+        .timer {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .phase {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .difficulty-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .difficulty-card {
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
+            padding: 15px 10px;
             cursor: pointer;
-            box-shadow: 0 4px #7c3aed;
-            user-select: none;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
-
-        .ctrl-btn:active {
-            box-shadow: 0 2px #7c3aed;
-            transform: translateY(2px);
+        
+        .difficulty-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .difficulty-card.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: var(--primary-light);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .difficulty-title {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .difficulty-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .hold-indicator {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--warning);
+            font-weight: 600;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        @keyframes particle-float {
+            0% { transform: translateY(0) scale(1); opacity: 0.7; }
+            100% { transform: translateY(-20px) scale(0.5); opacity: 0; }
+        }
+        
+        .warning {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: left;
+        }
+        
+        .warning strong {
+            color: var(--warning);
         }
     </style>
 </head>
 <body>
-
-    <div id="game-container">
-        <div id="game-view">
-            <div id="road"></div>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🌬️</span>
+                <h1>屏息挑戰</h1>
+            </div>
+            <p class="tagline">掌握呼吸節奏，提升專注力與放鬆效果</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="animation-section">
+                <div class="breathing-animation">
+                    <div class="lung-container">
+                        <div class="lung" id="lung"></div>
+                        <div class="breath-path"></div>
+                        <div class="breath-dot" id="breath-dot" style="bottom: 10%;"></div>
+                    </div>
+                </div>
+                
+                <div class="instructions" id="instructions">
+                    請選擇難度級別開始練習
+                </div>
+                
+                <div class="timer" id="timer">0</div>
+                <div class="phase" id="phase">準備開始</div>
+                
+                <div class="hold-indicator hidden" id="hold-indicator">
+                    屏息中... 保持住！
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <h2 style="margin-bottom: 20px;">呼吸模式</h2>
+                
+                <div class="difficulty-selector" id="difficulty-selector">
+                    <div class="difficulty-card" data-level="beginner">
+                        <h3 class="difficulty-title">初級</h3>
+                        <p class="difficulty-desc">吸4秒 → 屏4秒 → 呼6秒</p>
+                    </div>
+                    <div class="difficulty-card" data-level="intermediate">
+                        <h3 class="difficulty-title">進階</h3>
+                        <p class="difficulty-desc">吸5秒 → 屏7秒 → 呼8秒</p>
+                    </div>
+                    <div class="difficulty-card" data-level="advanced">
+                        <h3 class="difficulty-title">高級</h3>
+                        <p class="difficulty-desc">吸6秒 → 屏12秒 → 呼10秒</p>
+                    </div>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="inhale-time">0</div>
+                        <div class="stat-label">吸氣(秒)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="hold-time">0</div>
+                        <div class="stat-label">屏息(秒)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="exhale-time">0</div>
+                        <div class="stat-label">呼氣(秒)</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="start-btn">開始練習</button>
+                    <button class="btn btn-secondary hidden" id="pause-btn">暫停</button>
+                    <button class="btn btn-warning hidden" id="reset-btn">重新開始</button>
+                </div>
+                
+                <div class="warning">
+                    <strong>安全提示：</strong> 如果您感到頭暈或不適，請立即停止練習並恢復正常呼吸。初學者請從初級模式開始。
+                </div>
+            </div>
         </div>
-        <div id="player"></div>
-    </div>
-
-    <div id="controls">
-        <button id="left-btn" class="ctrl-btn">←</button>
-        <button id="right-btn" class="ctrl-btn">→</button>
     </div>
 
     <script>
-        const player = document.getElementById('player');
-        const gameContainer = document.getElementById('game-container');
-        const road = document.getElementById('road');
-        
-        // 遊戲狀態變數
-        let playerX = gameContainer.offsetWidth / 2 - 20; // 初始位置
-        const playerWidth = 40;
-        const roadWidth = gameContainer.offsetWidth;
-        const moveSpeed = 5;
-        let isMovingLeft = false;
-        let isMovingRight = false;
-        
-        // 遊戲迴圈（每幀更新）
-        function gameLoop() {
-            // 處理玩家移動
-            if (isMovingLeft) {
-                playerX = Math.max(playerX - moveSpeed, 0); // 避免移出左邊界
+        // 難度設定
+        const difficultySettings = {
+            beginner: {
+                inhale: 4,
+                hold: 4,
+                exhale: 6,
+                color: '#2ecc71'
+            },
+            intermediate: {
+                inhale: 5,
+                hold: 7,
+                exhale: 8,
+                color: '#3498db'
+            },
+            advanced: {
+                inhale: 6,
+                hold: 12,
+                exhale: 10,
+                color: '#9b59b6'
             }
-            if (isMovingRight) {
-                playerX = Math.min(playerX + moveSpeed, roadWidth - playerWidth); // 避免移出右邊界
+        };
+        
+        // DOM 元素
+        const difficultySelector = document.getElementById('difficulty-selector');
+        const instructions = document.getElementById('instructions');
+        const timer = document.getElementById('timer');
+        const phase = document.getElementById('phase');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const breathDot = document.getElementById('breath-dot');
+        const lung = document.getElementById('lung');
+        const holdIndicator = document.getElementById('hold-indicator');
+        const inhaleTimeEl = document.getElementById('inhale-time');
+        const holdTimeEl = document.getElementById('hold-time');
+        const exhaleTimeEl = document.getElementById('exhale-time');
+        
+        // 狀態變數
+        let currentDifficulty = null;
+        let isPlaying = false;
+        let currentPhase = 'inhale'; // inhale, hold, exhale
+        let currentTime = 0;
+        let cycleCount = 0;
+        let animationInterval = null;
+        let particleInterval = null;
+        
+        // 初始化
+        function init() {
+            // 添加難度選擇事件監聽
+            document.querySelectorAll('.difficulty-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // 移除所有卡片的active類
+                    document.querySelectorAll('.difficulty-card').forEach(c => {
+                        c.classList.remove('active');
+                    });
+                    
+                    // 添加當前卡片的active類
+                    this.classList.add('active');
+                    
+                    // 設置當前難度
+                    currentDifficulty = this.getAttribute('data-level');
+                    
+                    // 更新統計信息
+                    inhaleTimeEl.textContent = difficultySettings[currentDifficulty].inhale;
+                    holdTimeEl.textContent = difficultySettings[currentDifficulty].hold;
+                    exhaleTimeEl.textContent = difficultySettings[currentDifficulty].exhale;
+                    
+                    // 更新說明
+                    instructions.textContent = `準備練習 ${getDifficultyName(currentDifficulty)} 模式`;
+                });
+            });
+            
+            // 開始按鈕事件
+            startBtn.addEventListener('click', startBreathing);
+            
+            // 暫停按鈕事件
+            pauseBtn.addEventListener('click', pauseBreathing);
+            
+            // 重置按鈕事件
+            resetBtn.addEventListener('click', resetBreathing);
+        }
+        
+        // 開始呼吸練習
+        function startBreathing() {
+            if (!currentDifficulty) {
+                alert('請先選擇一個難度級別');
+                return;
             }
             
-            // 更新玩家位置
-            player.style.left = playerX + 'px';
+            isPlaying = true;
+            currentPhase = 'inhale';
+            currentTime = 0;
             
-            // 模擬道路移動 (景深效果) - 雖然道路是靜態的，但可以通過背景動畫模擬跑酷感
-            // road.style.backgroundPositionY = (parseFloat(road.style.backgroundPositionY || 0) + 5) + 'px';
-
-            requestAnimationFrame(gameLoop); // 請求下一幀
+            // 更新UI
+            startBtn.classList.add('hidden');
+            pauseBtn.classList.remove('hidden');
+            resetBtn.classList.remove('hidden');
+            
+            // 開始呼吸循環
+            startBreathingCycle();
         }
-
-        // --- 控制邏輯 (鍵盤 + 觸控) ---
         
-        // 鍵盤控制 (電腦測試用)
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'A' || e.key === 'a') {
-                isMovingLeft = true;
-            } else if (e.key === 'ArrowRight' || e.key === 'D' || e.key === 'd') {
-                isMovingRight = true;
+        // 開始呼吸循環
+        function startBreathingCycle() {
+            clearInterval(animationInterval);
+            
+            animationInterval = setInterval(() => {
+                if (!isPlaying) return;
+                
+                const settings = difficultySettings[currentDifficulty];
+                
+                // 更新當前階段時間
+                currentTime++;
+                timer.textContent = currentTime;
+                
+                // 根據階段更新動畫和指示
+                switch(currentPhase) {
+                    case 'inhale':
+                        // 吸氣階段 - 圓點下降
+                        let inhaleProgress = (currentTime / settings.inhale) * 90;
+                        breathDot.style.bottom = `${10 + inhaleProgress}%`;
+                        phase.textContent = "吸氣...";
+                        phase.style.color = '#2ecc71';
+                        instructions.textContent = "緩慢吸氣，填充肺部";
+                        lung.style.transform = `scale(${1 + (currentTime / settings.inhale) * 0.3})`;
+                        
+                        // 創建吸入粒子
+                        if (currentTime % 2 === 0) {
+                            createParticle('inhale');
+                        }
+                        
+                        if (currentTime >= settings.inhale) {
+                            currentPhase = 'hold';
+                            currentTime = 0;
+                            holdIndicator.classList.remove('hidden');
+                        }
+                        break;
+                        
+                    case 'hold':
+                        // 屏息階段 - 圓點保持位置
+                        phase.textContent = "屏息...";
+                        phase.style.color = '#f39c12';
+                        instructions.textContent = "保持呼吸，放鬆身體";
+                        holdIndicator.textContent = `屏息中... ${currentTime}秒`;
+                        
+                        // 創建屏息粒子
+                        if (currentTime % 3 === 0) {
+                            createParticle('hold');
+                        }
+                        
+                        if (currentTime >= settings.hold) {
+                            currentPhase = 'exhale';
+                            currentTime = 0;
+                            holdIndicator.classList.add('hidden');
+                        }
+                        break;
+                        
+                    case 'exhale':
+                        // 呼氣階段 - 圓點上升
+                        let exhaleProgress = (currentTime / settings.exhale) * 90;
+                        breathDot.style.bottom = `${100 - exhaleProgress}%`;
+                        phase.textContent = "呼氣...";
+                        phase.style.color = '#e74c3c';
+                        instructions.textContent = "緩慢呼氣，釋放壓力";
+                        lung.style.transform = `scale(${1.3 - (currentTime / settings.exhale) * 0.3})`;
+                        
+                        // 創建呼出粒子
+                        if (currentTime % 2 === 0) {
+                            createParticle('exhale');
+                        }
+                        
+                        if (currentTime >= settings.exhale) {
+                            // 完成一個循環
+                            cycleCount++;
+                            currentPhase = 'inhale';
+                            currentTime = 0;
+                            
+                            // 更新指示
+                            instructions.textContent = `完成 ${cycleCount} 個呼吸循環！繼續下一個...`;
+                        }
+                        break;
+                }
+                
+            }, 1000);
+        }
+        
+        // 創建粒子效果
+        function createParticle(type) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // 設置粒子位置在圓點附近
+            const dotRect = breathDot.getBoundingClientRect();
+            const containerRect = document.querySelector('.lung-container').getBoundingClientRect();
+            
+            const left = dotRect.left - containerRect.left + dotRect.width / 2;
+            const bottom = dotRect.bottom - containerRect.top;
+            
+            particle.style.left = `${left}px`;
+            particle.style.bottom = `${bottom}px`;
+            
+            // 根據階段設置粒子顏色和動畫
+            switch(type) {
+                case 'inhale':
+                    particle.style.background = '#2ecc71';
+                    particle.style.animation = 'particle-float 1.5s forwards';
+                    break;
+                case 'hold':
+                    particle.style.background = '#f39c12';
+                    particle.style.animation = 'particle-float 2s forwards';
+                    break;
+                case 'exhale':
+                    particle.style.background = '#e74c3c';
+                    particle.style.animation = 'particle-float 1s forwards';
+                    break;
             }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'A' || e.key === 'a') {
-                isMovingLeft = false;
-            } else if (e.key === 'ArrowRight' || e.key === 'D' || e.key === 'd') {
-                isMovingRight = false;
+            
+            document.querySelector('.lung-container').appendChild(particle);
+            
+            // 粒子動畫結束後移除
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 2000);
+        }
+        
+        // 暫停呼吸練習
+        function pauseBreathing() {
+            isPlaying = !isPlaying;
+            pauseBtn.textContent = isPlaying ? '暫停' : '繼續';
+            
+            if (isPlaying) {
+                switch(currentPhase) {
+                    case 'inhale':
+                        instructions.textContent = "緩慢吸氣，填充肺部";
+                        break;
+                    case 'hold':
+                        instructions.textContent = "保持呼吸，放鬆身體";
+                        break;
+                    case 'exhale':
+                        instructions.textContent = "緩慢呼氣，釋放壓力";
+                        break;
+                }
+            } else {
+                instructions.textContent = "已暫停";
+                phase.textContent = "暫停中";
+                phase.style.color = '#95a5a6';
             }
-        });
-        
-        // 手機觸控控制
-        const leftBtn = document.getElementById('left-btn');
-        const rightBtn = document.getElementById('right-btn');
-        
-        function handleTouchStart(e, direction) {
-            e.preventDefault(); // 防止手機預設行為
-            if (direction === 'left') isMovingLeft = true;
-            if (direction === 'right') isMovingRight = true;
         }
-
-        function handleTouchEnd(e, direction) {
-            e.preventDefault();
-            if (direction === 'left') isMovingLeft = false;
-            if (direction === 'right') isMovingRight = false;
+        
+        // 重置呼吸練習
+        function resetBreathing() {
+            clearInterval(animationInterval);
+            isPlaying = false;
+            currentTime = 0;
+            cycleCount = 0;
+            
+            // 重置UI
+            timer.textContent = "0";
+            phase.textContent = "準備開始";
+            phase.style.color = 'white';
+            instructions.textContent = "請選擇難度級別開始練習";
+            breathDot.style.bottom = "10%";
+            lung.style.transform = "scale(1)";
+            holdIndicator.classList.add('hidden');
+            
+            // 顯示開始按鈕
+            startBtn.classList.remove('hidden');
+            pauseBtn.classList.add('hidden');
+            resetBtn.classList.add('hidden');
         }
-
-        leftBtn.addEventListener('touchstart', (e) => handleTouchStart(e, 'left'), false);
-        leftBtn.addEventListener('touchend', (e) => handleTouchEnd(e, 'left'), false);
-        leftBtn.addEventListener('touchcancel', (e) => handleTouchEnd(e, 'left'), false);
-
-        rightBtn.addEventListener('touchstart', (e) => handleTouchStart(e, 'right'), false);
-        rightBtn.addEventListener('touchend', (e) => handleTouchEnd(e, 'right'), false);
-        rightBtn.addEventListener('touchcancel', (e) => handleTouchEnd(e, 'right'), false);
-
-        // 啟動遊戲迴圈
-        gameLoop();
-
+        
+        // 獲取難度名稱
+        function getDifficultyName(level) {
+            const names = {
+                beginner: '初級',
+                intermediate: '進階',
+                advanced: '高級'
+            };
+            return names[level];
+        }
+        
+        // 初始化應用
+        init();
     </script>
 </body>
 </html>
