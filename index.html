@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2.5D 像素跑酷 MVP</title>
+    <style>
+        :root {
+            --game-width: 400px;
+            --game-height: 600px;
+            --road-height: 2000px; /* 模擬景深 */
+            --player-size: 40px;
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #333;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            touch-action: none; /* 禁用瀏覽器預設觸控行為 */
+        }
+
+        /* 遊戲主容器，設定視角 */
+        #game-container {
+            width: var(--game-width);
+            height: var(--game-height);
+            background: linear-gradient(#87CEEB, #AEC6CF); /* 天空背景 */
+            border: 5px solid #000;
+            overflow: hidden;
+            position: relative;
+            /* 2.5D 核心：設置透視深度 */
+            perspective: 600px; 
+            transform-style: preserve-3d;
+        }
+
+        /* 遊戲場景，應用 3D 旋轉 */
+        #game-view {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-origin: bottom center;
+            /* 2.5D 核心：向後傾斜，模擬道路無限延伸 */
+            transform: rotateX(45deg); 
+            bottom: 0;
+        }
+
+        /* 道路 */
+        #road {
+            width: 100%;
+            height: var(--road-height);
+            background-color: #4CAF50; /* 草地 */
+            position: absolute;
+            bottom: 0;
+            /* 道路紋理/分割線 */
+            box-shadow: inset 0 0 0 5px #388E3C, 
+                        inset 0 100px 0 0 #A0A0A0; /* 模擬道路中央線 */
+            background-image: linear-gradient(to right, #66BB6A 50%, #4CAF50 50%);
+            background-size: 50px 100%;
+        }
+
+        /* 玩家角色 */
+        #player {
+            width: var(--player-size);
+            height: var(--player-size);
+            background-color: #FF5722; /* 橘色 */
+            position: absolute;
+            bottom: 0;
+            left: calc(50% - (var(--player-size) / 2));
+            z-index: 10;
+            /* 簡單的像素風外觀 */
+            border: 2px solid #000;
+            box-shadow: 2px 2px #000;
+            border-radius: 5px;
+        }
+
+        /* 控制按鈕 (手機友好) */
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            z-index: 20;
+        }
+
+        .ctrl-btn {
+            padding: 20px 40px;
+            font-size: 1.5em;
+            background-color: var(--ai-chat, #A855F7);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px #7c3aed;
+            user-select: none;
+        }
+
+        .ctrl-btn:active {
+            box-shadow: 0 2px #7c3aed;
+            transform: translateY(2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="game-view">
+            <div id="road"></div>
+        </div>
+        <div id="player"></div>
+    </div>
+
+    <div id="controls">
+        <button id="left-btn" class="ctrl-btn">←</button>
+        <button id="right-btn" class="ctrl-btn">→</button>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const gameContainer = document.getElementById('game-container');
+        const road = document.getElementById('road');
+        
+        // 遊戲狀態變數
+        let playerX = gameContainer.offsetWidth / 2 - 20; // 初始位置
+        const playerWidth = 40;
+        const roadWidth = gameContainer.offsetWidth;
+        const moveSpeed = 5;
+        let isMovingLeft = false;
+        let isMovingRight = false;
+        
+        // 遊戲迴圈（每幀更新）
+        function gameLoop() {
+            // 處理玩家移動
+            if (isMovingLeft) {
+                playerX = Math.max(playerX - moveSpeed, 0); // 避免移出左邊界
+            }
+            if (isMovingRight) {
+                playerX = Math.min(playerX + moveSpeed, roadWidth - playerWidth); // 避免移出右邊界
+            }
+            
+            // 更新玩家位置
+            player.style.left = playerX + 'px';
+            
+            // 模擬道路移動 (景深效果) - 雖然道路是靜態的，但可以通過背景動畫模擬跑酷感
+            // road.style.backgroundPositionY = (parseFloat(road.style.backgroundPositionY || 0) + 5) + 'px';
+
+            requestAnimationFrame(gameLoop); // 請求下一幀
+        }
+
+        // --- 控制邏輯 (鍵盤 + 觸控) ---
+        
+        // 鍵盤控制 (電腦測試用)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'A' || e.key === 'a') {
+                isMovingLeft = true;
+            } else if (e.key === 'ArrowRight' || e.key === 'D' || e.key === 'd') {
+                isMovingRight = true;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'A' || e.key === 'a') {
+                isMovingLeft = false;
+            } else if (e.key === 'ArrowRight' || e.key === 'D' || e.key === 'd') {
+                isMovingRight = false;
+            }
+        });
+        
+        // 手機觸控控制
+        const leftBtn = document.getElementById('left-btn');
+        const rightBtn = document.getElementById('right-btn');
+        
+        function handleTouchStart(e, direction) {
+            e.preventDefault(); // 防止手機預設行為
+            if (direction === 'left') isMovingLeft = true;
+            if (direction === 'right') isMovingRight = true;
+        }
+
+        function handleTouchEnd(e, direction) {
+            e.preventDefault();
+            if (direction === 'left') isMovingLeft = false;
+            if (direction === 'right') isMovingRight = false;
+        }
+
+        leftBtn.addEventListener('touchstart', (e) => handleTouchStart(e, 'left'), false);
+        leftBtn.addEventListener('touchend', (e) => handleTouchEnd(e, 'left'), false);
+        leftBtn.addEventListener('touchcancel', (e) => handleTouchEnd(e, 'left'), false);
+
+        rightBtn.addEventListener('touchstart', (e) => handleTouchStart(e, 'right'), false);
+        rightBtn.addEventListener('touchend', (e) => handleTouchEnd(e, 'right'), false);
+        rightBtn.addEventListener('touchcancel', (e) => handleTouchEnd(e, 'right'), false);
+
+        // 啟動遊戲迴圈
+        gameLoop();
+
+    </script>
+</body>
+</html>
