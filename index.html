@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>呼吸訓練遊戲 | 屏息挑戰</title>
+    <!-- 添加 Supabase 客戶端庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #3498db;
@@ -330,6 +332,82 @@
         .warning strong {
             color: var(--warning);
         }
+        
+        .records-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .records-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .records-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .records-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .record-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .record-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-light);
+        }
+        
+        .record-list {
+            list-style-type: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .record-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .record-item:last-child {
+            border-bottom: none;
+        }
+        
+        .best-record {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .db-status {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        
+        .db-online {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .db-offline {
+            background: var(--danger);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -340,6 +418,7 @@
                 <h1>屏息挑戰</h1>
             </div>
             <p class="tagline">掌握呼吸節奏，提升專注力與放鬆效果</p>
+            <div id="db-status" class="db-status db-offline">數據庫: 離線模式</div>
         </header>
         
         <div class="game-container">
@@ -370,7 +449,7 @@
                 <div class="difficulty-selector" id="difficulty-selector">
                     <div class="difficulty-card" data-level="beginner">
                         <h3 class="difficulty-title">初級</h3>
-                        <p class="difficulty-desc">吸4秒 → 屏4秒 → 呼6秒</p>
+                        <p class="difficulty-desc">吸4秒 → 屏4秒 → 呼7秒</p>
                     </div>
                     <div class="difficulty-card" data-level="intermediate">
                         <h3 class="difficulty-title">進階</h3>
@@ -408,15 +487,33 @@
                 </div>
             </div>
         </div>
+        
+        <div class="records-section">
+            <h2 class="records-title">呼吸記錄</h2>
+            <div class="records-container">
+                <div class="record-card">
+                    <h3>最佳成績</h3>
+                    <ul class="record-list" id="best-records">
+                        <li class="record-item">載入中...</li>
+                    </ul>
+                </div>
+                <div class="record-card">
+                    <h3>最近練習</h3>
+                    <ul class="record-list" id="recent-records">
+                        <li class="record-item">載入中...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 難度設定
+        // 難度設定 - 已更新為新要求
         const difficultySettings = {
             beginner: {
                 inhale: 4,
                 hold: 4,
-                exhale: 6,
+                exhale: 7,
                 color: '#2ecc71'
             },
             intermediate: {
@@ -433,6 +530,31 @@
             }
         };
         
+        // ==================== Supabase 配置 ====================
+        // 請替換為您的實際 Supabase 配置
+        const SUPABASE_URL = 'https://fayorxvfxtrycjiiiyfu.supabase.co';  // ← 替換這裡
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZheW9yeHZmeHRyeWNqaWlpeWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzY1MTAsImV4cCI6MjA3OTg1MjUxMH0.7znE_AaNg6zESUO-RoSsyFqxCgcxjPT_pQiN557e6Nw';  // ← 替換這裡
+        
+        // 初始化 Supabase 客戶端
+        let supabase;
+        let useLocalStorage = true;
+        
+        try {
+            if (SUPABASE_URL && SUPABASE_ANON_KEY && 
+                SUPABASE_URL !== 'https://your-project.supabase.co' && 
+                SUPABASE_ANON_KEY !== 'your-anon-key') {
+                
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                useLocalStorage = false;
+                document.getElementById('db-status').textContent = '數據庫: 在線模式';
+                document.getElementById('db-status').className = 'db-status db-online';
+            }
+        } catch (error) {
+            console.error('Supabase 初始化失敗:', error);
+            useLocalStorage = true;
+        }
+        // ==================== Supabase 配置結束 ====================
+        
         // DOM 元素
         const difficultySelector = document.getElementById('difficulty-selector');
         const instructions = document.getElementById('instructions');
@@ -447,6 +569,8 @@
         const inhaleTimeEl = document.getElementById('inhale-time');
         const holdTimeEl = document.getElementById('hold-time');
         const exhaleTimeEl = document.getElementById('exhale-time');
+        const bestRecordsList = document.getElementById('best-records');
+        const recentRecordsList = document.getElementById('recent-records');
         
         // 狀態變數
         let currentDifficulty = null;
@@ -454,8 +578,9 @@
         let currentPhase = 'inhale'; // inhale, hold, exhale
         let currentTime = 0;
         let cycleCount = 0;
+        let totalSessionTime = 0;
         let animationInterval = null;
-        let particleInterval = null;
+        let sessionStartTime = null;
         
         // 初始化
         function init() {
@@ -491,6 +616,9 @@
             
             // 重置按鈕事件
             resetBtn.addEventListener('click', resetBreathing);
+            
+            // 載入記錄
+            loadRecords();
         }
         
         // 開始呼吸練習
@@ -503,6 +631,9 @@
             isPlaying = true;
             currentPhase = 'inhale';
             currentTime = 0;
+            cycleCount = 0;
+            totalSessionTime = 0;
+            sessionStartTime = new Date();
             
             // 更新UI
             startBtn.classList.add('hidden');
@@ -524,6 +655,7 @@
                 
                 // 更新當前階段時間
                 currentTime++;
+                totalSessionTime++;
                 timer.textContent = currentTime;
                 
                 // 根據階段更新動畫和指示
@@ -590,6 +722,11 @@
                             
                             // 更新指示
                             instructions.textContent = `完成 ${cycleCount} 個呼吸循環！繼續下一個...`;
+                            
+                            // 每完成3個循環自動保存一次
+                            if (cycleCount % 3 === 0) {
+                                saveSessionRecord();
+                            }
                         }
                         break;
                 }
@@ -667,7 +804,14 @@
             clearInterval(animationInterval);
             isPlaying = false;
             currentTime = 0;
+            
+            // 保存最後的記錄
+            if (cycleCount > 0) {
+                saveSessionRecord();
+            }
+            
             cycleCount = 0;
+            totalSessionTime = 0;
             
             // 重置UI
             timer.textContent = "0";
@@ -682,6 +826,144 @@
             startBtn.classList.remove('hidden');
             pauseBtn.classList.add('hidden');
             resetBtn.classList.add('hidden');
+        }
+        
+        // 保存練習記錄
+        async function saveSessionRecord() {
+            if (cycleCount === 0) return;
+            
+            const recordData = {
+                difficulty: currentDifficulty,
+                cycles: cycleCount,
+                total_time: totalSessionTime,
+                created_at: new Date().toISOString(),
+                inhale_duration: difficultySettings[currentDifficulty].inhale,
+                hold_duration: difficultySettings[currentDifficulty].hold,
+                exhale_duration: difficultySettings[currentDifficulty].exhale
+            };
+            
+            if (!useLocalStorage && supabase) {
+                // 使用 Supabase 保存
+                try {
+                    const { data, error } = await supabase
+                        .from('breathing_records')
+                        .insert([recordData])
+                        .select();
+                    
+                    if (error) {
+                        console.error('Supabase 保存失敗:', error);
+                        saveToLocalStorage(recordData);
+                    } else {
+                        console.log('記錄已保存到 Supabase:', data);
+                        loadRecords();
+                    }
+                } catch (err) {
+                    console.error('Supabase 保存異常:', err);
+                    saveToLocalStorage(recordData);
+                }
+            } else {
+                // 使用本地存儲
+                saveToLocalStorage(recordData);
+            }
+        }
+        
+        // 使用本地存儲作為備用方案
+        function saveToLocalStorage(recordData) {
+            try {
+                const records = JSON.parse(localStorage.getItem('breathing_records') || '[]');
+                records.push({
+                    id: Date.now(),
+                    ...recordData
+                });
+                localStorage.setItem('breathing_records', JSON.stringify(records));
+                loadRecords();
+            } catch (err) {
+                console.error('本地存儲失敗:', err);
+            }
+        }
+        
+        // 載入記錄
+        async function loadRecords() {
+            if (!useLocalStorage && supabase) {
+                // 從 Supabase 載入
+                try {
+                    const { data, error } = await supabase
+                        .from('breathing_records')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) {
+                        console.error('Supabase 載入失敗:', error);
+                        loadFromLocalStorage();
+                    } else {
+                        console.log('從 Supabase 載入記錄:', data);
+                        displayRecords(data);
+                    }
+                } catch (err) {
+                    console.error('Supabase 載入異常:', err);
+                    loadFromLocalStorage();
+                }
+            } else {
+                // 從本地存儲載入
+                loadFromLocalStorage();
+            }
+        }
+        
+        // 從本地存儲載入記錄
+        function loadFromLocalStorage() {
+            try {
+                const records = JSON.parse(localStorage.getItem('breathing_records') || '[]');
+                displayRecords(records);
+            } catch (err) {
+                console.error('從本地存儲載入記錄失敗:', err);
+            }
+        }
+        
+        // 顯示記錄
+        function displayRecords(records) {
+            // 清空列表
+            bestRecordsList.innerHTML = '';
+            recentRecordsList.innerHTML = '';
+            
+            if (records.length === 0) {
+                bestRecordsList.innerHTML = '<li class="record-item">尚無記錄</li>';
+                recentRecordsList.innerHTML = '<li class="record-item">尚無記錄</li>';
+                return;
+            }
+            
+            // 找出最佳成績（按循環次數）
+            const bestByDifficulty = {};
+            records.forEach(record => {
+                const difficulty = record.difficulty;
+                if (!bestByDifficulty[difficulty] || record.cycles > bestByDifficulty[difficulty].cycles) {
+                    bestByDifficulty[difficulty] = record;
+                }
+            });
+            
+            // 顯示最佳成績
+            Object.keys(bestByDifficulty).forEach(difficulty => {
+                const record = bestByDifficulty[difficulty];
+                const listItem = document.createElement('li');
+                listItem.className = 'record-item best-record';
+                listItem.innerHTML = `
+                    <span>${getDifficultyName(difficulty)}</span>
+                    <span>${record.cycles} 循環</span>
+                `;
+                bestRecordsList.appendChild(listItem);
+            });
+            
+            // 顯示最近5條記錄
+            const recentRecords = records.slice(0, 5);
+            recentRecords.forEach(record => {
+                const listItem = document.createElement('li');
+                listItem.className = 'record-item';
+                const date = new Date(record.created_at).toLocaleDateString();
+                listItem.innerHTML = `
+                    <span>${getDifficultyName(record.difficulty)} - ${date}</span>
+                    <span>${record.cycles} 循環</span>
+                `;
+                recentRecordsList.appendChild(listItem);
+            });
         }
         
         // 獲取難度名稱
