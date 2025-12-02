@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>呼吸訓練 | 專注與放鬆</title>
+    <title>呼吸訓練 | 分級挑戰版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -13,7 +13,7 @@
             --warning: #f39c12;
             --dark: #2c3e50;
             --glass: rgba(255, 255, 255, 0.1);
-            --glass-strong: rgba(255, 255, 255, 0.2);
+            --glass-strong: rgba(255, 255, 255, 0.25);
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
         
@@ -26,7 +26,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             color: white;
             min-height: 100vh;
             overflow-x: hidden;
@@ -64,86 +64,104 @@
             margin: auto 0;
         }
         
-        /* 標題與 LOGO */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .logo-icon {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 10px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
+        header { text-align: center; margin-bottom: 25px; }
+        .logo-icon { font-size: 3rem; display: block; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         h1 { font-size: 2rem; margin-bottom: 5px; }
-        .tagline { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+        .tagline { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
 
-        /* 難度選擇卡片 */
-        .mode-grid {
+        /* --- 選擇器樣式 --- */
+        
+        /* 1. 類別選擇 (Grid) */
+        .category-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
-
-        .mode-card {
-            background: var(--glass);
-            border: 2px solid transparent;
-            padding: 15px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .mode-card:hover { background: var(--glass-strong); }
         
-        .mode-card.active {
+        .cat-card {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid transparent;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .cat-card.active {
+            background: rgba(255,255,255,0.2);
             border-color: var(--secondary);
-            background: rgba(46, 204, 113, 0.2);
             transform: scale(1.02);
         }
+        
+        .cat-icon { font-size: 1.5rem; margin-bottom: 5px; display: block; }
+        .cat-name { font-weight: bold; font-size: 1rem; }
 
-        .mode-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; }
-        .mode-desc { font-size: 0.85rem; opacity: 0.8; }
+        /* 2. 難度選擇 (Row) */
+        .difficulty-container {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: none; /* JS 控制顯示 */
+        }
+        .difficulty-container.show { display: block; animation: fadeIn 0.3s; }
+        
+        .section-title { font-size: 0.9rem; opacity: 0.8; margin-bottom: 10px; display: block; }
 
-        /* 自訂模式區域 */
+        .diff-options {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .diff-btn {
+            flex: 1;
+            padding: 10px 5px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: transparent;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .diff-btn:hover { background: rgba(255,255,255,0.1); }
+        .diff-btn.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+
+        /* 3. 自訂面板 */
         .custom-controls {
             background: rgba(0,0,0,0.2);
             padding: 15px;
             border-radius: 15px;
-            margin-bottom: 25px;
-            display: none; /* 預設隱藏 */
+            margin-bottom: 20px;
+            display: none;
         }
-        
         .custom-controls.show { display: block; animation: fadeIn 0.3s; }
-
+        
         .slider-group { margin-bottom: 15px; }
         .slider-label { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 5px;
-            outline: none;
-            -webkit-appearance: none;
+        input[type="range"] { width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 5px; outline: none; -webkit-appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: white; border-radius: 50%; cursor: pointer; }
+
+        /* 預覽資訊區 */
+        .preview-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
         }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            cursor: pointer;
-        }
+        .preview-text { font-size: 1.1rem; color: var(--secondary); font-weight: bold; }
+        .preview-sub { font-size: 0.85rem; opacity: 0.7; margin-top: 4px; }
 
         /* 呼吸動畫 */
         .breathing-circle-container {
@@ -155,100 +173,33 @@
             align-items: center;
             justify-content: center;
         }
-
-        .circle-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-
+        .circle-bg { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); }
         .circle-lung {
-            width: 150px;
-            height: 150px;
+            width: 150px; height: 150px;
             background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
             border-radius: 50%;
-            transition: transform 0.1s linear; /* 用 JS 控制 */
             box-shadow: 0 0 30px var(--secondary);
             opacity: 0.8;
+            transform: scale(1);
+            /* 關鍵：使用 CSS transition 讓變化平滑 */
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .phase-text {
-            position: absolute;
-            text-align: center;
-            z-index: 10;
-        }
-
+        .phase-text { position: absolute; text-align: center; z-index: 10; }
         .timer-big { font-size: 4rem; font-weight: bold; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .phase-label { font-size: 1.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; }
         
-        /* 統計數據 */
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 15px;
-            margin-top: 20px;
-            width: 100%;
-        }
-        .stat-item { text-align: center; }
-        .stat-val { font-size: 1.5rem; font-weight: bold; }
-        .stat-lbl { font-size: 0.8rem; opacity: 0.7; }
-
-        /* 按鈕系統 */
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
+        /* 按鈕與列表 */
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: transform 0.2s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--secondary); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); }
         .btn-danger { background: var(--danger); color: white; }
         .btn-outline { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; }
-
-        /* 列表樣式 */
-        .record-list {
-            list-style: none;
-            max-height: 400px;
-            overflow-y: auto;
-            width: 100%;
-        }
-        .record-item {
-            background: rgba(255,255,255,0.1);
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .record-date { font-size: 0.8rem; opacity: 0.7; }
         
-        /* 連線狀態 */
-        .db-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: rgba(0,0,0,0.5);
-        }
+        .record-list { list-style: none; max-height: 400px; overflow-y: auto; width: 100%; }
+        .record-item { background: rgba(255,255,255,0.1); margin-bottom: 10px; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .db-status { position: fixed; top: 10px; right: 10px; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; background: rgba(0,0,0,0.5); }
         .online { color: var(--secondary); }
-        .offline { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -258,46 +209,55 @@
     <div id="home-page" class="page active">
         <div class="container">
             <header>
-                <div class="logo-icon">🌬️</div>
+                <div class="logo-icon">🧘‍♂️</div>
                 <h1>呼吸訓練</h1>
-                <p class="tagline">自訂節奏，專注當下</p>
+                <p class="tagline">選擇適合您的節奏與強度</p>
             </header>
 
-            <h3 style="margin-bottom: 15px;">選擇模式</h3>
-            <div class="mode-grid">
-                <div class="mode-card active" onclick="selectMode('relax')">
-                    <div class="mode-title">放鬆</div>
-                    <div class="mode-desc">吸 4 秒 / 呼 6 秒</div>
+            <span class="section-title">選擇模式</span>
+            <div class="category-grid">
+                <div class="cat-card active" onclick="selectCategory('relax')" id="cat-relax">
+                    <span class="cat-icon">🌙</span>
+                    <span class="cat-name">放鬆</span>
                 </div>
-                <div class="mode-card" onclick="selectMode('balance')">
-                    <div class="mode-title">平衡</div>
-                    <div class="mode-desc">吸 5 秒 / 呼 5 秒</div>
+                <div class="cat-card" onclick="selectCategory('balance')" id="cat-balance">
+                    <span class="cat-icon">⚖️</span>
+                    <span class="cat-name">平衡</span>
                 </div>
-                <div class="mode-card" onclick="selectMode('energy')">
-                    <div class="mode-title">提神</div>
-                    <div class="mode-desc">吸 4 秒 / 呼 2 秒</div>
+                <div class="cat-card" onclick="selectCategory('energy')" id="cat-energy">
+                    <span class="cat-icon">⚡</span>
+                    <span class="cat-name">提神</span>
                 </div>
-                <div class="mode-card" onclick="selectMode('custom')">
-                    <div class="mode-title">自訂</div>
-                    <div class="mode-desc">自選秒數</div>
+                <div class="cat-card" onclick="selectCategory('custom')" id="cat-custom">
+                    <span class="cat-icon">⚙️</span>
+                    <span class="cat-name">自訂</span>
+                </div>
+            </div>
+
+            <div id="difficulty-panel" class="difficulty-container show">
+                <span class="section-title">選擇強度</span>
+                <div class="diff-options">
+                    <button class="diff-btn active" onclick="selectDifficulty('easy')" id="diff-easy">容易</button>
+                    <button class="diff-btn" onclick="selectDifficulty('medium')" id="diff-medium">進階</button>
+                    <button class="diff-btn" onclick="selectDifficulty('hard')" id="diff-hard">高級</button>
                 </div>
             </div>
 
             <div id="custom-panel" class="custom-controls">
+                <span class="section-title">自訂秒數</span>
                 <div class="slider-group">
-                    <div class="slider-label">
-                        <span>吸氣時間</span>
-                        <span id="label-inhale">4 秒</span>
-                    </div>
-                    <input type="range" id="input-inhale" min="2" max="15" value="4" oninput="updateCustomLabels()">
+                    <div class="slider-label"><span>吸氣</span><span id="label-inhale">4 秒</span></div>
+                    <input type="range" id="input-inhale" min="2" max="15" value="4" oninput="updateCustomSettings()">
                 </div>
                 <div class="slider-group">
-                    <div class="slider-label">
-                        <span>呼氣時間</span>
-                        <span id="label-exhale">6 秒</span>
-                    </div>
-                    <input type="range" id="input-exhale" min="2" max="20" value="6" oninput="updateCustomLabels()">
+                    <div class="slider-label"><span>呼氣</span><span id="label-exhale">6 秒</span></div>
+                    <input type="range" id="input-exhale" min="2" max="20" value="6" oninput="updateCustomSettings()">
                 </div>
+            </div>
+
+            <div class="preview-info">
+                <div class="preview-text" id="preview-text">吸 4 秒 ⮕ 呼 6 秒</div>
+                <div class="preview-sub" id="preview-desc">適合初學者，幫助副交感神經放鬆</div>
             </div>
 
             <button class="btn btn-primary" onclick="startGame()">
@@ -321,14 +281,14 @@
                 </div>
             </div>
 
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-val" id="stat-cycles">0</div>
-                    <div class="stat-lbl">循環次數</div>
+            <div style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-top: 20px;">
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold;" id="stat-cycles">0</div>
+                    <div style="font-size: 0.8rem; opacity: 0.7;">循環</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-val" id="stat-time">00:00</div>
-                    <div class="stat-lbl">總時間</div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: bold;" id="stat-time">00:00</div>
+                    <div style="font-size: 0.8rem; opacity: 0.7;">時間</div>
                 </div>
             </div>
 
@@ -345,20 +305,59 @@
             <header>
                 <h2>練習記錄</h2>
             </header>
-            
             <ul class="record-list" id="record-list">
                 <li style="text-align:center; padding:20px;">載入中...</li>
             </ul>
-
             <button class="btn btn-outline" onclick="showPage('home-page')">返回首頁</button>
         </div>
     </div>
 
     <script>
-        // ==================== Supabase 設定 ====================
+        // ==================== 設定與資料結構 ====================
+        // 定義所有模式與難度的秒數配置
+        const PRESETS = {
+            relax: {
+                easy:   { i: 4, e: 6, desc: "適合初學者，基礎放鬆" },
+                medium: { i: 4, e: 8, desc: "進階放鬆，延長呼氣釋放壓力" },
+                hard:   { i: 5, e: 10, desc: "深度放鬆，需要較好的肺活量" }
+            },
+            balance: {
+                easy:   { i: 4, e: 4, desc: "簡單的等長呼吸，穩定情緒" },
+                medium: { i: 5, e: 5, desc: "標準共振呼吸頻率" },
+                hard:   { i: 6, e: 6, desc: "每分鐘5次呼吸，黃金平衡狀態" }
+            },
+            energy: {
+                easy:   { i: 4, e: 2, desc: "溫和提神，增加氧氣攝入" },
+                medium: { i: 5, e: 2, desc: "快速喚醒大腦" },
+                hard:   { i: 6, e: 1, desc: "強力呼吸，迅速提升專注力" }
+            },
+            custom: {
+                // 自訂模式的數值由滑桿決定，這裡是初始值
+                i: 4, e: 6, desc: "自訂您的專屬節奏"
+            }
+        };
+
+        // 應用程式狀態
+        const state = {
+            category: 'relax', // relax, balance, energy, custom
+            difficulty: 'easy', // easy, medium, hard
+            customSettings: { i: 4, e: 6 },
+            
+            // 練習中的狀態
+            session: {
+                active: false,
+                phase: 'inhale',
+                startTime: null,
+                totalSeconds: 0,
+                cycles: 0,
+                timerRef: null,
+                currentConfig: null // 實際執行的秒數設定 {i, e}
+            }
+        };
+
+        // ==================== Supabase (保留原設定) ====================
         const SUPABASE_URL = 'https://fayorxvfxtrycjiiiyfu.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZheW9yeHZmeHRyeWNqaWlpeWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzY1MTAsImV4cCI6MjA3OTg1MjUxMH0.7znE_AaNg6zESUO-RoSsyFqxCgcxjPT_pQiN557e6Nw';
-
         let supabase;
         let isOnline = false;
 
@@ -367,151 +366,141 @@
             isOnline = true;
             document.getElementById('db-status').innerHTML = '● 雲端連線';
             document.getElementById('db-status').classList.add('online');
-        } catch (e) {
-            console.error("Supabase init error", e);
-        }
-
-        // ==================== 應用程式狀態 ====================
-        const state = {
-            currentMode: 'relax', // relax, balance, energy, custom
-            settings: {
-                relax: { inhale: 4, exhale: 6 },
-                balance: { inhale: 5, exhale: 5 },
-                energy: { inhale: 4, exhale: 2 },
-                custom: { inhale: 4, exhale: 6 }
-            },
-            session: {
-                active: false,
-                phase: 'inhale', // inhale, exhale
-                startTime: null,
-                totalSeconds: 0,
-                cycles: 0,
-                timerRef: null,
-                animationRef: null
-            }
-        };
+        } catch (e) { console.error("Supabase init error", e); }
 
         // ==================== 頁面導航 ====================
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            
-            if(pageId === 'history-page') {
-                loadRecords();
-            }
+            if(pageId === 'history-page') loadRecords();
         }
 
-        // ==================== 設定與模式選擇 ====================
-        function selectMode(mode) {
-            state.currentMode = mode;
-            
-            // UI 更新
-            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
-            event.currentTarget.classList.add('active'); // 注意：在onclick中使用需確保event傳遞
-            
-            // 顯示/隱藏自訂面板
-            const panel = document.getElementById('custom-panel');
-            if (mode === 'custom') {
-                panel.classList.add('show');
-            } else {
-                panel.classList.remove('show');
-            }
-        }
+        // ==================== 介面互動邏輯 ====================
         
-        // 修正：手動綁定 click 事件以確保 active class 正確切換
-        document.querySelectorAll('.mode-card').forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        // 1. 選擇類別 (Relax, Balance...)
+        function selectCategory(cat) {
+            state.category = cat;
+            
+            // 更新卡片樣式
+            document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(`cat-${cat}`).classList.add('active');
 
-        function updateCustomLabels() {
-            const inhale = parseInt(document.getElementById('input-inhale').value);
-            const exhale = parseInt(document.getElementById('input-exhale').value);
+            // 顯示/隱藏控制面板
+            const diffPanel = document.getElementById('difficulty-panel');
+            const customPanel = document.getElementById('custom-panel');
+
+            if (cat === 'custom') {
+                diffPanel.classList.remove('show');
+                customPanel.classList.add('show');
+            } else {
+                diffPanel.classList.add('show');
+                customPanel.classList.remove('show');
+            }
             
-            document.getElementById('label-inhale').textContent = `${inhale} 秒`;
-            document.getElementById('label-exhale').textContent = `${exhale} 秒`;
-            
-            state.settings.custom.inhale = inhale;
-            state.settings.custom.exhale = exhale;
+            updatePreview();
         }
 
-        // ==================== 遊戲邏輯 (核心修改) ====================
-        function startGame() {
-            const config = state.settings[state.currentMode];
+        // 2. 選擇難度 (Easy, Medium...)
+        function selectDifficulty(diff) {
+            state.difficulty = diff;
             
-            // 初始化狀態
-            state.session = {
-                active: true,
-                phase: 'inhale',
-                startTime: Date.now(),
-                totalSeconds: 0,
-                cycles: 0,
-                timerRef: null,
-                phaseTime: 0,
-                config: config
-            };
+            // 更新按鈕樣式
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`diff-${diff}`).classList.add('active');
+            
+            updatePreview();
+        }
 
+        // 3. 更新自訂數值
+        function updateCustomSettings() {
+            const i = parseInt(document.getElementById('input-inhale').value);
+            const e = parseInt(document.getElementById('input-exhale').value);
+            
+            document.getElementById('label-inhale').textContent = `${i} 秒`;
+            document.getElementById('label-exhale').textContent = `${e} 秒`;
+            
+            state.customSettings = { i, e };
+            updatePreview();
+        }
+
+        // 4. 更新下方預覽文字
+        function updatePreview() {
+            let config;
+            let desc = "";
+
+            if (state.category === 'custom') {
+                config = state.customSettings;
+                desc = PRESETS.custom.desc;
+            } else {
+                config = PRESETS[state.category][state.difficulty];
+                desc = config.desc;
+            }
+
+            document.getElementById('preview-text').innerHTML = 
+                `吸 <span style="color:#2ecc71">${config.i}</span> 秒 ⮕ 呼 <span style="color:#3498db">${config.e}</span> 秒`;
+            document.getElementById('preview-desc').textContent = desc;
+        }
+
+        // ==================== 遊戲核心邏輯 ====================
+        function startGame() {
+            // 確定當前使用的配置
+            if (state.category === 'custom') {
+                state.session.currentConfig = { ...state.customSettings };
+            } else {
+                state.session.currentConfig = { ...PRESETS[state.category][state.difficulty] };
+            }
+
+            // 初始化狀態
+            state.session.active = true;
+            state.session.phase = 'inhale';
+            state.session.startTime = Date.now();
+            state.session.totalSeconds = 0;
+            state.session.cycles = 0;
+            
             // 重置 UI
             document.getElementById('stat-cycles').textContent = '0';
             document.getElementById('stat-time').textContent = '00:00';
-            showPage('game-page');
             
+            // 設定 CSS Transition 時間 (初次設定為吸氣時間)
+            const lung = document.getElementById('lung-visual');
+            lung.style.transitionDuration = `${state.session.currentConfig.i}s`;
+
+            showPage('game-page');
             runGameLoop();
         }
 
         function runGameLoop() {
-            const { config } = state.session;
-            const lung = document.getElementById('lung-visual');
-            const phaseLabel = document.getElementById('phase-label');
             const timerDisplay = document.getElementById('main-timer');
-            const instruction = document.getElementById('instruction-text');
-            
-            let phaseElapsed = 0; // 當前階段經過的秒數
-            
-            // 每一秒更新一次邏輯
+            let phaseTimeElapsed = 0; // 當前階段過了幾秒
+
+            // 啟動視覺與倒數
+            updatePhaseVisuals();
+
             state.session.timerRef = setInterval(() => {
                 if (!state.session.active) return;
 
-                state.session.totalSeconds++;
-                phaseElapsed++;
+                const config = state.session.currentConfig;
+                const targetTime = state.session.phase === 'inhale' ? config.i : config.e;
 
-                // 更新總時間顯示
+                state.session.totalSeconds++;
+                phaseTimeElapsed++;
+
+                // 總時間顯示
                 const mins = Math.floor(state.session.totalSeconds / 60).toString().padStart(2, '0');
                 const secs = (state.session.totalSeconds % 60).toString().padStart(2, '0');
                 document.getElementById('stat-time').textContent = `${mins}:${secs}`;
 
-                // 獲取當前階段的目標時間
-                const targetTime = state.session.phase === 'inhale' ? config.inhale : config.exhale;
-                const remaining = targetTime - phaseElapsed;
+                // 倒數計時顯示
+                const remaining = targetTime - phaseTimeElapsed;
+                timerDisplay.textContent = Math.max(remaining, 0) + 1; // +1 讓視覺不會停在 0 太久
 
-                // 更新倒數計時
-                timerDisplay.textContent = Math.max(remaining, 0) + 1; // +1 讓視覺上更自然
-
-                // 階段切換邏輯
-                if (phaseElapsed >= targetTime) {
-                    phaseElapsed = 0;
+                // 階段切換
+                if (phaseTimeElapsed >= targetTime) {
+                    phaseTimeElapsed = 0;
                     switchPhase();
                 }
 
             }, 1000);
-
-            // 啟動第一個階段
-            updatePhaseVisuals();
-            
-            // 動畫循環 (更平滑的視覺效果)
-            function animate() {
-                if (!state.session.active) return;
-                
-                const currentDuration = state.session.phase === 'inhale' ? config.inhale : config.exhale;
-                // 計算進度 0.0 ~ 1.0
-                // 由於 setInterval 和 requestAnimationFrame 不同步，這裡做簡單的視覺模擬
-                // 為了精確，我們使用 CSS transition，JS 只負責觸發狀態
-                
-                requestAnimationFrame(animate);
-            }
-            animate();
         }
 
         function switchPhase() {
@@ -526,32 +515,29 @@
         }
 
         function updatePhaseVisuals() {
-            const { phase, config } = state.session;
+            const { phase, currentConfig } = state.session;
             const lung = document.getElementById('lung-visual');
             const phaseLabel = document.getElementById('phase-label');
             const instruction = document.getElementById('instruction-text');
             const timerDisplay = document.getElementById('main-timer');
 
-            // 重置階段計時顯示
-            timerDisplay.textContent = phase === 'inhale' ? config.inhale : config.exhale;
+            // 重置倒數數字
+            timerDisplay.textContent = phase === 'inhale' ? currentConfig.i : currentConfig.e;
+
+            // 設置 CSS Transition 時間
+            const duration = phase === 'inhale' ? currentConfig.i : currentConfig.e;
+            lung.style.transitionDuration = `${duration}s`;
 
             if (phase === 'inhale') {
                 phaseLabel.textContent = "吸氣";
-                phaseLabel.style.color = "#2ecc71"; // 綠色
+                phaseLabel.style.color = "#2ecc71";
                 instruction.textContent = "用鼻子緩慢吸氣，感受胸腔擴張...";
-                
-                // 動畫：變大
-                lung.style.transition = `transform ${config.inhale}s cubic-bezier(0.4, 0, 0.2, 1)`;
                 lung.style.transform = "scale(1.8)";
                 lung.style.backgroundColor = "rgba(46, 204, 113, 0.6)";
-
             } else {
                 phaseLabel.textContent = "呼氣";
-                phaseLabel.style.color = "#3498db"; // 藍色
+                phaseLabel.style.color = "#3498db";
                 instruction.textContent = "用嘴巴慢慢吐氣，放鬆全身...";
-                
-                // 動畫：變小
-                lung.style.transition = `transform ${config.exhale}s cubic-bezier(0.4, 0, 0.2, 1)`;
                 lung.style.transform = "scale(1)";
                 lung.style.backgroundColor = "rgba(52, 152, 219, 0.6)";
             }
@@ -561,43 +547,48 @@
             state.session.active = false;
             clearInterval(state.session.timerRef);
             
-            // 儲存記錄
             if (state.session.totalSeconds > 5) {
                 saveRecord();
             }
-            
             showPage('home-page');
         }
 
-        // ==================== 數據儲存 ====================
+        // ==================== 數據儲存與讀取 ====================
         async function saveRecord() {
+            const config = state.session.currentConfig;
+            
+            // 組合模式名稱，例如 "relax-medium" 或 "custom"
+            let modeName = state.category;
+            if (state.category !== 'custom') {
+                modeName += `-${state.difficulty}`;
+            }
+
             const record = {
-                mode: state.currentMode,
-                inhale: state.session.config.inhale,
-                exhale: state.session.config.exhale,
+                mode: modeName,
+                inhale: config.i,
+                exhale: config.e,
                 cycles: state.session.cycles,
                 duration: state.session.totalSeconds,
                 created_at: new Date().toISOString()
             };
 
-            // 1. 存入 LocalStorage (備份)
-            const localRecords = JSON.parse(localStorage.getItem('breath_records') || '[]');
+            // 1. LocalStorage
+            const localRecords = JSON.parse(localStorage.getItem('breath_records_v2') || '[]');
             localRecords.unshift(record);
-            localStorage.setItem('breath_records', JSON.stringify(localRecords));
+            localStorage.setItem('breath_records_v2', JSON.stringify(localRecords));
 
-            // 2. 存入 Supabase
+            // 2. Supabase
             if (isOnline) {
                 const { error } = await supabase
-                    .from('breathing_records') // 假設資料表名稱不變
+                    .from('breathing_records')
                     .insert([{
-                        difficulty: record.mode, // 映射舊欄位名
+                        difficulty: record.mode,
                         cycles: record.cycles,
                         total_time: record.duration,
                         inhale_duration: record.inhale,
-                        exhale_duration: record.exhale, // 移除 hold_duration
+                        exhale_duration: record.exhale,
                         created_at: record.created_at
                     }]);
-                
                 if (error) console.error("Supabase Save Error:", error);
             }
         }
@@ -608,7 +599,6 @@
             
             let records = [];
 
-            // 優先嘗試讀取 Supabase
             if (isOnline) {
                 const { data, error } = await supabase
                     .from('breathing_records')
@@ -621,22 +611,28 @@
                         mode: d.difficulty,
                         cycles: d.cycles,
                         duration: d.total_time,
-                        created_at: d.created_at
+                        created_at: d.created_at,
+                        i: d.inhale_duration,
+                        e: d.exhale_duration
                     }));
                 }
             }
 
-            // 如果沒抓到或離線，讀取 LocalStorage
             if (records.length === 0) {
-                records = JSON.parse(localStorage.getItem('breath_records') || '[]');
+                records = JSON.parse(localStorage.getItem('breath_records_v2') || '[]');
             }
 
-            // 渲染
             list.innerHTML = '';
             if (records.length === 0) {
                 list.innerHTML = '<li class="record-item" style="justify-content:center;">尚無記錄</li>';
                 return;
             }
+
+            // 中文對照表
+            const dict = {
+                'relax': '放鬆', 'balance': '平衡', 'energy': '提神', 'custom': '自訂',
+                'easy': '容易', 'medium': '進階', 'hard': '高級'
+            };
 
             records.forEach(r => {
                 const li = document.createElement('li');
@@ -646,28 +642,34 @@
                     month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
 
-                // 翻譯模式名稱
-                const modeName = {
-                    'relax': '放鬆', 'balance': '平衡', 'energy': '提神', 'custom': '自訂',
-                    'beginner': '初級', 'intermediate': '進階', 'advanced': '高級'
-                }[r.mode] || r.mode;
+                // 格式化名稱: relax-medium -> 放鬆 (進階)
+                let displayMode = r.mode;
+                if (r.mode.includes('-')) {
+                    const [cat, diff] = r.mode.split('-');
+                    displayMode = `${dict[cat] || cat} <small>(${dict[diff] || diff})</small>`;
+                } else {
+                    displayMode = dict[r.mode] || r.mode;
+                }
+                
+                // 如果有詳細秒數資料就顯示，沒有則不顯示
+                const details = (r.i && r.e) ? `<br><small style="opacity:0.6">吸${r.i} 呼${r.e}</small>` : '';
 
                 li.innerHTML = `
                     <div>
-                        <div style="font-weight:bold; color:var(--secondary)">${modeName}</div>
-                        <div class="record-date">${date}</div>
+                        <div style="font-weight:bold; color:var(--secondary)">${displayMode}</div>
+                        <div style="font-size:0.8rem; opacity:0.7">${date}${details}</div>
                     </div>
                     <div style="text-align:right">
                         <div style="font-size:1.1rem">${r.cycles} 循環</div>
-                        <div style="font-size:0.8rem opacity:0.7">${Math.floor(r.duration/60)}分${r.duration%60}秒</div>
+                        <div style="font-size:0.8rem; opacity:0.7">${Math.floor(r.duration/60)}分${r.duration%60}秒</div>
                     </div>
                 `;
                 list.appendChild(li);
             });
         }
-        
-        // 初始化：預設選擇放鬆模式
-        updateCustomLabels();
+
+        // 初始化
+        updatePreview();
     </script>
 </body>
 </html>
