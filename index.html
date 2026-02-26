@@ -7,169 +7,24 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-            padding-bottom: 20px;
-        }
-
-        /* 導航列 */
-        .nav-bar {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1rem;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .nav-btn.active {
-            background: rgba(255,255,255,0.2);
-            box-shadow: inset 0 0 5px rgba(255,255,255,0.2);
-        }
-
-        /* 頁面切換 */
-        .page {
-            display: none;
-            padding: 10px;
-            animation: fadeIn 0.3s ease;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: white; }
+        .nav-bar { position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-around; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); padding: 10px; }
+        .nav-btn { background: none; border: none; color: white; font-size: 1rem; padding: 10px; cursor: pointer; border-radius: 8px; }
+        .nav-btn.active { background: rgba(255,255,255,0.2); }
+        .page { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        h1 { font-size: 1.8rem; margin-bottom: 10px; text-align: center; }
-        
-        /* 練習卡片 */
-        .practice-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .practice-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-            text-align: center;
-        }
-        
-        .practice-card:active { transform: scale(0.95); }
-        
-        .practice-card.selected {
-            border-color: #ffd700;
-            background: rgba(255,255,255,0.2);
-            box-shadow: 0 0 15px rgba(255,215,0,0.3);
-        }
-
-        .practice-icon { font-size: 2.2rem; display: block; margin-bottom: 8px; }
-        .practice-name { font-weight: bold; margin-bottom: 5px; }
-        .practice-desc { font-size: 0.75rem; opacity: 0.7; }
-
-        /* 滑桿 */
-        .slider-group {
-            margin: 15px 0;
-            background: rgba(0,0,0,0.15);
-            padding: 12px;
-            border-radius: 12px;
-        }
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-        input[type=range] {
-            width: 100%;
-            cursor: pointer;
-        }
-
-        /* 按鈕 */
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 10px 0;
-            transition: 0.2s;
-        }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .container { max-width: 500px; margin: 0 auto; background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+        .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .practice-card { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        .practice-card.selected { border-color: #ffd700; background: rgba(255,255,255,0.2); }
+        .slider-group { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin: 10px 0; }
         .btn-primary { background: #ffd700; color: #333; }
-        .btn-secondary { background: rgba(255,255,255,0.2); color: white; }
         .btn-danger { background: #ff4757; color: white; }
-
-        /* 動畫圓圈 */
-        .breathing-circle {
-            width: 180px;
-            height: 180px;
-            margin: 40px auto;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ffd700, #ffa500);
-            transition: transform 1s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 40px rgba(255,215,0,0.4);
-        }
-        .phase-text { font-size: 1.8rem; font-weight: bold; color: #333; }
-        .timer-big { font-size: 3.5rem; font-weight: bold; text-align: center; margin: 15px 0; }
-
-        /* 記錄 */
-        .record-item {
-            background: rgba(255,255,255,0.08);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chart-container { height: 250px; margin-top: 20px; }
+        .breathing-circle { width: 180px; height: 180px; margin: 40px auto; border-radius: 50%; background: radial-gradient(circle, #ffd700, #ffa500); transition: transform 1s ease-in-out; display: flex; align-items: center; justify-content: center; }
+        .record-item { background: rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -177,347 +32,181 @@
     <div class="nav-bar">
         <button class="nav-btn active" onclick="showPage('home')">🏠 練習</button>
         <button class="nav-btn" onclick="showPage('records')">📊 紀錄</button>
-        <button class="nav-btn" onclick="showPage('goals')">🎯 目標</button>
         <button class="nav-btn" onclick="showPage('stats')">📈 統計</button>
     </div>
 
     <div id="home" class="page active">
         <div class="container">
-            <h1>🌬️ 呼吸練習</h1>
+            <h1 style="text-align:center">🌬️ 呼吸練習</h1>
             <div class="practice-grid" id="practiceGrid"></div>
-
-            <div id="settingsPanel" style="display: none;">
+            <div id="settingsPanel" style="display:none">
                 <div class="slider-group">
-                    <div class="slider-label"><span>吸氣時間</span><span id="inhaleValue">4 秒</span></div>
-                    <input type="range" id="inhaleSlider" min="2" max="15" value="4">
+                    <span>吸氣: <span id="v_inhale">4</span>s</span>
+                    <input type="range" id="s_inhale" min="2" max="15" value="4" style="width:100%">
                 </div>
                 <div class="slider-group">
-                    <div class="slider-label"><span>吐氣時間</span><span id="exhaleValue">6 秒</span></div>
-                    <input type="range" id="exhaleSlider" min="2" max="20" value="6">
-                </div>
-                <div class="slider-group">
-                    <div class="slider-label"><span>練習時長</span><span id="minutesValue">5 分鐘</span></div>
-                    <input type="range" id="minutesSlider" min="1" max="30" value="5">
+                    <span>吐氣: <span id="v_exhale">6</span>s</span>
+                    <input type="range" id="s_exhale" min="2" max="20" value="6" style="width:100%">
                 </div>
             </div>
-
-            <button class="btn btn-primary" onclick="startPractice()" id="startBtn" disabled>請先選擇練習模式</button>
+            <button class="btn btn-primary" id="startBtn" onclick="startPractice()" disabled>請選擇模式</button>
         </div>
     </div>
 
     <div id="practice" class="page">
-        <div class="container" style="text-align: center;">
-            <h2 id="practiceName">練習中</h2>
-            <div class="breathing-circle" id="breathCircle">
-                <div class="phase-text" id="phaseText">準備</div>
+        <div class="container" style="text-align:center">
+            <h2 id="curName">練習中</h2>
+            <div class="breathing-circle" id="circle"><b id="phaseTxt" style="color:#333; font-size:1.5rem">準備</b></div>
+            <h2 id="countDown">3</h2>
+            <div style="display:flex; justify-content: space-around; margin-top:20px">
+                <div><h3 id="c_cycle">0</h3>次</div>
+                <div><h3 id="c_time">0:00</h3>時間</div>
             </div>
-            <div class="timer-big" id="timerDisplay">3</div>
-            
-            <div style="display: flex; justify-content: space-around; margin: 20px 0;">
-                <div><div style="font-size: 1.5rem;" id="cycleCount">0</div><div>循環</div></div>
-                <div><div style="font-size: 1.5rem;" id="timeCount">0:00</div><div>總時長</div></div>
-            </div>
-
-            <button class="btn btn-secondary" onclick="togglePause()" id="pauseBtn">⏸️ 暫停</button>
-            <button class="btn btn-danger" onclick="stopPractice()">⏹️ 結束並儲存</button>
+            <button class="btn btn-danger" onclick="stopPractice()">結束並儲存</button>
         </div>
     </div>
 
     <div id="records" class="page">
         <div class="container">
-            <h2>📋 歷史記錄</h2>
-            <div id="recordsList" style="margin-top:15px;"></div>
-        </div>
-    </div>
-
-    <div id="goals" class="page">
-        <div class="container">
-            <h2>🎯 訓練目標</h2>
-            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">設定你的每日呼吸挑戰</p>
-            <div id="goalsList"></div>
-            <button class="btn btn-secondary" style="margin-top:20px" onclick="showPage('home')">返回首頁</button>
+            <h2>📋 歷史紀錄</h2>
+            <div id="recordsList" style="margin-top:15px"></div>
         </div>
     </div>
 
     <div id="stats" class="page">
         <div class="container">
-            <h2>📈 進步統計</h2>
-            <div class="chart-container">
-                <canvas id="progressChart"></canvas>
-            </div>
-            <button class="btn btn-secondary" onclick="showPage('home')">返回</button>
+            <h2>📈 進步趨勢</h2>
+            <canvas id="pChart" style="height:250px; margin-top:20px"></canvas>
         </div>
     </div>
 
     <script>
-        // --- 初始化 Supabase ---
-        const SUPABASE_URL = 'https://fayorxvfxtrycjiiiyfu.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZheW9yeHZmeHRyeWNqaWlpeWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzY1MTAsImV4cCI6MjA3OTg1MjUxMH0.7znE_AaNg6zESUO-RoSsyFqxCgcxjPT_pQiN557e6Nw';
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-        const practices = [
-            { id: 1, name: '腹式呼吸', icon: '🌙', desc: '基礎放鬆', inhale: 4, exhale: 6 },
-            { id: 2, name: '3D 呼吸', icon: '🌍', desc: '全方位擴張', inhale: 4, exhale: 6 },
-            { id: 3, name: '深度吸氣', icon: '⬆️', desc: '肺活量訓練', inhale: 6, exhale: 4 },
-            { id: 4, name: '長效吐氣', icon: '⬇️', desc: '副交感神經激發', inhale: 4, exhale: 8 },
-            { id: 5, name: '1:2 呼吸', icon: '💆', desc: '快速減壓', inhale: 3, exhale: 6 },
-            { id: 6, name: '能量呼吸', icon: '👃', desc: '提升專注', inhale: 5, exhale: 5 }
-        ];
-
-        let state = {
-            selected: null,
-            inhale: 4,
-            exhale: 6,
-            minutes: 5,
-            isPracticing: false,
-            isPaused: false,
-            phase: 'inhale', // inhale / exhale
-            cycles: 0,
-            elapsedSeconds: 0,
-            phaseSeconds: 0,
-            timer: null
+        // --- 修正重複宣告問題：使用全域 window 物件檢查 ---
+        const CONFIG = {
+            URL: 'https://fayorxvfxtrycjiiiyfu.supabase.co',
+            KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZheW9yeHZmeHRyeWNqaWlpeWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzY1MTAsImV4cCI6MjA3OTg1MjUxMH0.7znE_AaNg6zESUO-RoSsyFqxCgcxjPT_pQiN557e6Nw'
         };
 
-        let myChart = null;
+        // 如果 db 已經存在就不要重新宣告，改名為 db 以防跟庫名稱衝突
+        if (typeof window.db === 'undefined') {
+            window.db = window.supabase ? window.supabase.createClient(CONFIG.URL, CONFIG.KEY) : null;
+        }
 
-        // --- 初始化頁面 ---
+        const data = [
+            { id: 1, name: '腹式呼吸', icon: '🌙', in: 4, ex: 6 },
+            { id: 2, name: '1:2 呼吸', icon: '💆', in: 3, ex: 6 },
+            { id: 3, name: '能量呼吸', icon: '👃', in: 5, ex: 5 },
+            { id: 4, name: '長效吐氣', icon: '⬇️', in: 4, ex: 8 }
+        ];
+
+        let state = { sel: null, in: 4, ex: 6, isRun: false, sec: 0, pSec: 0, phase: 'in', cycles: 0, timer: null };
+        let chart = null;
+
         document.addEventListener('DOMContentLoaded', () => {
-            renderPracticeGrid();
-            setupSliders();
-        });
-
-        function renderPracticeGrid() {
             const grid = document.getElementById('practiceGrid');
-            grid.innerHTML = practices.map(p => `
-                <div class="practice-card" onclick="selectPractice(${p.id})">
-                    <span class="practice-icon">${p.icon}</span>
-                    <div class="practice-name">${p.name}</div>
-                    <div class="practice-desc">${p.desc}</div>
+            grid.innerHTML = data.map(p => `
+                <div class="practice-card" onclick="select(${p.id})">
+                    <div style="font-size:2rem">${p.icon}</div>
+                    <b>${p.name}</b>
                 </div>
             `).join('');
-        }
 
-        function selectPractice(id) {
-            const p = practices.find(item => item.id === id);
-            state.selected = p;
-            state.inhale = p.inhale;
-            state.exhale = p.exhale;
+            document.getElementById('s_inhale').oninput = e => { state.in = +e.target.value; document.getElementById('v_inhale').innerText = state.in; };
+            document.getElementById('s_exhale').oninput = e => { state.ex = +e.target.value; document.getElementById('v_exhale').innerText = state.ex; };
+        });
 
-            // UI 更新
-            document.querySelectorAll('.practice-card').forEach((card, idx) => {
-                card.classList.toggle('selected', (idx + 1) === id);
-            });
-
+        function select(id) {
+            state.sel = data.find(p => p.id === id);
+            state.in = state.sel.in;
+            state.ex = state.sel.ex;
+            document.querySelectorAll('.practice-card').forEach((c, i) => c.classList.toggle('selected', (i+1)===id));
             document.getElementById('settingsPanel').style.display = 'block';
-            document.getElementById('inhaleSlider').value = p.inhale;
-            document.getElementById('exhaleSlider').value = p.exhale;
-            updateSliderLabels();
-
-            const startBtn = document.getElementById('startBtn');
-            startBtn.disabled = false;
-            startBtn.textContent = `▶️ 開始 ${p.name}`;
+            document.getElementById('s_inhale').value = state.in;
+            document.getElementById('s_exhale').value = state.ex;
+            document.getElementById('v_inhale').innerText = state.in;
+            document.getElementById('v_exhale').innerText = state.ex;
+            const btn = document.getElementById('startBtn');
+            btn.disabled = false;
+            btn.innerText = '▶️ 開始' + state.sel.name;
         }
 
-        function setupSliders() {
-            const ids = ['inhale', 'exhale', 'minutes'];
-            ids.forEach(id => {
-                document.getElementById(`${id}Slider`).oninput = (e) => {
-                    state[id] = parseInt(e.target.value);
-                    updateSliderLabels();
-                };
-            });
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(id)));
+            if(id === 'records') loadLogs();
+            if(id === 'stats') renderChart();
         }
 
-        function updateSliderLabels() {
-            document.getElementById('inhaleValue').textContent = state.inhale + ' 秒';
-            document.getElementById('exhaleValue').textContent = state.exhale + ' 秒';
-            document.getElementById('minutesValue').textContent = state.minutes + ' 分鐘';
-        }
-
-        // --- 核心邏輯：練習控制 ---
         function startPractice() {
             showPage('practice');
-            document.getElementById('practiceName').textContent = state.selected.name;
-            
-            state.isPracticing = true;
-            state.isPaused = false;
-            state.cycles = 0;
-            state.elapsedSeconds = 0;
-            state.phaseSeconds = 0;
-            state.phase = 'inhale';
-
-            updateBreathingUI();
-            
-            if (state.timer) clearInterval(state.timer);
+            state.isRun = true; state.sec = 0; state.pSec = 0; state.phase = 'in'; state.cycles = 0;
+            document.getElementById('curName').innerText = state.sel.name;
+            updateUI();
+            if(state.timer) clearInterval(state.timer);
             state.timer = setInterval(tick, 1000);
         }
 
         function tick() {
-            if (state.isPaused) return;
+            state.sec++; state.pSec++;
+            const target = state.phase === 'in' ? state.in : state.ex;
+            document.getElementById('countDown').innerText = Math.max(0, target - state.pSec);
+            document.getElementById('c_time').innerText = Math.floor(state.sec/60) + ':' + (state.sec%60).toString().padStart(2,'0');
 
-            state.elapsedSeconds++;
-            state.phaseSeconds++;
-
-            const targetPhaseTime = (state.phase === 'inhale') ? state.inhale : state.exhale;
-            
-            // 更新倒數
-            document.getElementById('timerDisplay').textContent = Math.max(0, targetPhaseTime - state.phaseSeconds);
-            
-            // 更新總時間顯示
-            const m = Math.floor(state.elapsedSeconds / 60);
-            const s = state.elapsedSeconds % 60;
-            document.getElementById('timeCount').textContent = `${m}:${s.toString().padStart(2, '0')}`;
-
-            // 切換階段
-            if (state.phaseSeconds >= targetPhaseTime) {
-                state.phaseSeconds = 0;
-                if (state.phase === 'inhale') {
-                    state.phase = 'exhale';
+            if(state.pSec >= target) {
+                state.pSec = 0;
+                if(state.phase === 'in') {
+                    state.phase = 'ex';
                 } else {
-                    state.phase = 'inhale';
+                    state.phase = 'in';
                     state.cycles++;
-                    document.getElementById('cycleCount').textContent = state.cycles;
+                    document.getElementById('c_cycle').innerText = state.cycles;
                 }
-                updateBreathingUI();
-            }
-
-            // 檢查練習是否結束
-            if (state.elapsedSeconds >= state.minutes * 60) {
-                stopPractice();
+                updateUI();
             }
         }
 
-        function updateBreathingUI() {
-            const circle = document.getElementById('breathCircle');
-            const txt = document.getElementById('phaseText');
-            
-            if (state.phase === 'inhale') {
-                txt.textContent = '吸氣';
-                circle.style.transform = 'scale(1.4)';
-            } else {
-                txt.textContent = '吐氣';
-                circle.style.transform = 'scale(0.8)';
-            }
-        }
-
-        function togglePause() {
-            state.isPaused = !state.isPaused;
-            document.getElementById('pauseBtn').textContent = state.isPaused ? '▶️ 繼續' : '⏸️ 暫停';
+        function updateUI() {
+            const c = document.getElementById('circle');
+            const t = document.getElementById('phaseTxt');
+            if(state.phase === 'in') { t.innerText = '吸氣'; c.style.transform = 'scale(1.4)'; }
+            else { t.innerText = '吐氣'; c.style.transform = 'scale(0.8)'; }
         }
 
         async function stopPractice() {
             clearInterval(state.timer);
-            state.isPracticing = false;
-            
-            if (state.cycles > 0) {
-                await saveToSupabase();
-            }
-            alert('練習結束！已為你記錄本次數據。');
+            const record = { practice_name: state.sel.name, duration_seconds: state.sec, cycles: state.cycles, notes: `吸${state.in}/吐${state.ex}`, created_at: new Date().toISOString() };
+            const local = JSON.parse(localStorage.getItem('logs') || '[]');
+            local.unshift(record);
+            localStorage.setItem('logs', JSON.stringify(local.slice(0,50)));
+            if(window.db) await window.db.from('practice_records').insert([record]);
+            alert('練習完成！');
             showPage('home');
         }
 
-        async function saveToSupabase() {
-            const record = {
-                practice_name: state.selected.name,
-                duration_seconds: state.elapsedSeconds,
-                cycles: state.cycles,
-                notes: `吸${state.inhale}/吐${state.exhale}`,
-                created_at: new Date().toISOString()
-            };
-
-            // 存儲至 LocalStorage 作為備份
-            const localData = JSON.parse(localStorage.getItem('breathing_logs') || '[]');
-            localData.unshift(record);
-            localStorage.setItem('breathing_logs', JSON.stringify(localData.slice(0, 50)));
-
-            if (supabase) {
-                await supabase.from('practice_records').insert([record]);
-            }
-        }
-
-        // --- 頁面與數據展示 ---
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('onclick').includes(pageId));
-            });
-
-            if (pageId === 'records') loadRecords();
-            if (pageId === 'stats') renderChart();
-            if (pageId === 'goals') loadGoals();
-        }
-
-        function loadRecords() {
-            const container = document.getElementById('recordsList');
-            const data = JSON.parse(localStorage.getItem('breathing_logs') || '[]');
-            
-            if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center; padding:20px;">尚無記錄，開始第一次練習吧！</p>';
-                return;
-            }
-
-            container.innerHTML = data.map(r => `
+        function loadLogs() {
+            const list = document.getElementById('recordsList');
+            const logs = JSON.parse(localStorage.getItem('logs') || '[]');
+            list.innerHTML = logs.length ? logs.map(l => `
                 <div class="record-item">
-                    <div>
-                        <div style="font-weight:bold">${r.practice_name}</div>
-                        <div style="font-size:0.8rem; opacity:0.6">${new Date(r.created_at).toLocaleDateString()} ${r.notes}</div>
-                    </div>
-                    <div style="text-align:right">
-                        <div>${r.cycles} 循環</div>
-                        <div style="font-size:0.8rem">${Math.floor(r.duration_seconds/60)}分${r.duration_seconds%60}秒</div>
-                    </div>
+                    <div><b>${l.practice_name}</b><br><small>${l.notes}</small></div>
+                    <div style="text-align:right"><b>${l.cycles}回</b><br><small>${Math.floor(l.duration_seconds/60)}分</small></div>
                 </div>
-            `).join('');
+            `).join('') : '<p style="text-align:center">暫無紀錄</p>';
         }
 
         function renderChart() {
-            const ctx = document.getElementById('progressChart');
-            if (!ctx) return;
-            
-            const data = JSON.parse(localStorage.getItem('breathing_logs') || '[]').reverse();
-            const labels = data.map(d => new Date(d.created_at).getDate() + '日');
-            const values = data.map(d => d.cycles);
-
-            if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
+            const ctx = document.getElementById('pChart').getContext('2d');
+            const logs = JSON.parse(localStorage.getItem('logs') || '[]').reverse();
+            if(chart) chart.destroy();
+            chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '每日練習循環數',
-                        data: values,
-                        borderColor: '#ffd700',
-                        tension: 0.3,
-                        fill: true,
-                        backgroundColor: 'rgba(255, 215, 0, 0.1)'
-                    }]
+                    labels: logs.map(l => new Date(l.created_at).getDate() + '日'),
+                    datasets: [{ label: '練習次數', data: logs.map(l => l.cycles), borderColor: '#ffd700', tension: 0.3 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { ticks: { color: "#fff" }, grid: { color: "rgba(255,255,255,0.1)" } },
-                        x: { ticks: { color: "#fff" }, grid: { color: "rgba(255,255,255,0.1)" } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+                options: { scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } }
             });
-        }
-
-        function loadGoals() {
-            const list = document.getElementById('goalsList');
-            list.innerHTML = `
-                <div class="record-item">
-                    <span>連續練習天數挑戰</span>
-                    <span style="color:#ffd700">3 / 7 天</span>
-                </div>
-                <div class="record-item">
-                    <span>每日 10 分鐘達成</span>
-                    <span style="color:#ffd700">已達成</span>
-                </div>
-            `;
         }
     </script>
 </body>
