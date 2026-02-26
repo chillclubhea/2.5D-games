@@ -3,109 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>呼吸訓練 · 一次性密碼解鎖版</title>
+    <title>呼吸訓練日記 · 專業版</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* 樣式保持與之前完全相同，這裡省略以節省篇幅，但實際使用時請保留原本完整樣式 */
         :root {
             --primary-gold: #ffd700;
             --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
-            --danger: #ff4757;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-gradient); min-height: 100vh; color: white; overflow-x: hidden; }
+        
+        /* 導航 */
         .nav-bar { position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .nav-btn { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1rem; cursor: pointer; transition: 0.3s; padding: 5px 10px; }
         .nav-btn.active { color: var(--primary-gold); font-weight: bold; }
+
+        /* 頁面切換 */
         .page { display: none; padding: 20px; animation: fadeIn 0.4s ease-out; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         .container { max-width: 480px; margin: 0 auto; background: rgba(255,255,255,0.05); border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
         h1 { text-align: center; margin-bottom: 20px; font-weight: 300; letter-spacing: 2px; }
-        .section-title { font-size: 1.2rem; margin: 20px 0 10px; color: var(--primary-gold); border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 5px; }
-        .practice-list { display: flex; flex-direction: column; gap: 12px; }
+
+        /* 標題與網格 */
+        .section-title { font-size: 1.1rem; color: var(--primary-gold); margin: 25px 0 10px; border-left: 4px solid var(--primary-gold); padding-left: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .practice-card { background: rgba(255,255,255,0.08); padding: 18px; border-radius: 16px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; }
         .practice-card:hover { background: rgba(255,255,255,0.12); }
         .practice-card.selected { border-color: var(--primary-gold); background: rgba(255,215,0,0.05); }
-        .practice-card.locked { opacity: 0.5; cursor: not-allowed; background: rgba(0,0,0,0.3); }
-        .practice-card.locked::after { content: "🔒"; position: absolute; top: 10px; right: 15px; font-size: 1.2rem; }
+        .practice-card.locked { opacity: 0.5; filter: grayscale(1); }
+        .practice-card.locked::after { content: '🔒'; position: absolute; top: 10px; right: 10px; font-size: 0.8rem; }
         .practice-card h3 { font-size: 1.1rem; margin-bottom: 4px; color: var(--primary-gold); }
-        .practice-card p { font-size: 0.85rem; opacity: 0.7; }
+        .practice-card p { font-size: 0.8rem; opacity: 0.7; line-height: 1.3; }
+
+        /* 解鎖按鈕區 */
+        .unlock-area { text-align: center; margin: 20px 0; }
+        .btn-unlock { background: var(--primary-gold); color: black; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+
+        /* 控制面板 */
         .control-panel { margin-top: 20px; background: rgba(0,0,0,0.2); border-radius: 16px; padding: 15px; display: none; }
+        
+        /* 新增練習說明區塊 */
+        .practice-detail { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
+        .practice-detail .title { font-size: 0.9rem; color: #ffd700; margin-bottom: 5px; }
+        .practice-detail .content { font-size: 0.85rem; line-height: 1.5; }
+
         .level-group { display: flex; gap: 10px; margin: 15px 0; }
         .btn-level { flex: 1; padding: 8px; border: 1px solid rgba(255,255,255,0.3); background: none; color: white; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
         .btn-level.active { background: var(--primary-gold); color: black; border-color: var(--primary-gold); }
+        
         .slider-box { margin-bottom: 15px; }
         .slider-header { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
         input[type=range] { width: 100%; height: 6px; border-radius: 5px; appearance: none; background: #444; }
         input[type=range]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: var(--primary-gold); border-radius: 50%; cursor: pointer; }
-        .unlock-area { margin: 20px 0; text-align: center; }
-        .btn-unlock { background: rgba(255,215,0,0.1); border: 1px dashed var(--primary-gold); color: var(--primary-gold); padding: 12px; border-radius: 30px; width: 100%; cursor: pointer; font-size: 1rem; transition: 0.3s; }
-        .btn-unlock:hover { background: rgba(255,215,0,0.2); }
-        .breathing-area { position: relative; height: 300px; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
-        .breath-circle { width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, #fceabb, #f8b500); box-shadow: 0 0 50px rgba(255, 215, 0, 0.3); transition: transform 1s linear; display: flex; align-items: center; justify-content: center; }
+
+        /* 呼吸動畫區域 */
+        .breathing-area { position: relative; height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0; }
+        .breath-circle { width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, #fceabb, #f8b500); box-shadow: 0 0 50px rgba(255, 215, 0, 0.3); transition: transform 1s linear; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
         .breath-circle.belly-mode { width: 180px; height: 120px; border-radius: 50% / 60% 60% 40% 40%; background: radial-gradient(circle at center, #ffdb99, #e69500); }
-        .phase-label { font-size: 1.8rem; font-weight: bold; color: #333; text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
-        .timer-display { font-size: 4rem; font-weight: 200; margin: 10px 0; text-align: center; }
+        .phase-label { font-size: 1.8rem; font-weight: bold; color: #333; text-shadow: 0 1px 2px rgba(255,255,255,0.5); text-align: center; }
+        .timer-display { font-size: 4rem; font-weight: 200; text-align: center; line-height: 1; }
+        .instruction-text { font-size: 0.9rem; color: #aaa; text-align: center; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; display: none; }
+
+        /* 按鈕 */
         .btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .btn-primary { background: var(--primary-gold); color: #000; }
-        .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
         .btn-danger { background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid #ff4757; }
+
+        /* 安全警告彈窗 */
+        .warning-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .warning-box { background: #222; border: 2px solid #ff4757; padding: 25px; border-radius: 20px; max-width: 400px; }
+
+        /* 紀錄卡片 */
         .log-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .warning { background: rgba(255, 71, 87, 0.2); border-left: 5px solid var(--danger); padding: 12px; margin: 15px 0; border-radius: 8px; font-size: 0.9rem; }
-        .warning strong { color: var(--danger); }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .modal-box { background: #1e1e1e; padding: 25px; border-radius: 20px; width: 80%; max-width: 300px; text-align: center; }
-        .modal-box input { width: 100%; padding: 12px; margin: 15px 0; border: none; border-radius: 8px; background: #333; color: white; font-size: 1rem; }
-        .modal-box .btn { margin: 5px; }
+
+        /* 創作者面板 */
+        #adminPanel { background: #111; border: 1px dashed var(--primary-gold); padding: 15px; margin-top: 30px; border-radius: 10px; display: none; text-align: center; }
     </style>
 </head>
 <body>
-
-    <!-- 自訂密碼模態框 -->
-    <div class="modal-overlay" id="passwordModal">
-        <div class="modal-box">
-            <h3 style="color:var(--primary-gold);">🔐 解鎖進階練習</h3>
-            <input type="password" id="unlockPassword" placeholder="請輸入一次性密碼">
-            <button class="btn btn-primary" onclick="verifyPassword()">確認</button>
-            <button class="btn" style="background:#333;" onclick="closeModal()">取消</button>
-        </div>
-    </div>
 
     <nav class="nav-bar">
         <button class="nav-btn active" onclick="showPage('home')">🏠 訓練</button>
         <button class="nav-btn" onclick="showPage('records')">📋 紀錄</button>
         <button class="nav-btn" onclick="showPage('stats')">📈 統計</button>
+        <button class="nav-btn" id="voiceBtn" onclick="toggleVoice()">🔊 語音</button>
     </nav>
 
-    <!-- 首頁：練習選擇 -->
     <div id="home" class="page active">
         <div class="container">
             <h1>呼吸練習</h1>
-            <div class="section-title">🌱 基礎練習</div>
-            <div class="practice-list" id="basicPracticeList"></div>
-
-            <div id="unlockButtonContainer" class="unlock-area">
-                <button class="btn-unlock" onclick="showPasswordModal()">🔓 解鎖進階練習</button>
+            
+            <div class="unlock-area" id="unlockArea">
+                <button class="btn-unlock" onclick="handleUnlock()">🔓 解鎖進階練習</button>
             </div>
 
-            <div id="advancedSection" style="display: none;">
-                <div class="section-title">⚡ 進階練習</div>
-                <div class="practice-list" id="advancedPracticeList"></div>
-            </div>
+            <div class="section-title">基礎練習</div>
+            <div class="practice-grid" id="basicGrid"></div>
+
+            <div class="section-title">進階練習 <span id="lockStatus" style="font-size:0.7rem; color:#888;">已鎖定</span></div>
+            <div class="practice-grid" id="advGrid"></div>
 
             <div class="control-panel" id="controlPanel">
-                <div id="levelSection">
-                    <p style="font-size: 0.8rem; opacity: 0.7;">訓練強度</p>
+                <!-- 練習說明區塊（新增） -->
+                <div class="practice-detail" id="practiceDetail">
+                    <div class="title">📘 練習說明</div>
+                    <div class="content" id="detailText"></div>
+                </div>
+
+                <div id="baseControls">
                     <div class="level-group">
                         <button class="btn-level active" onclick="setLevel('simple')">簡單</button>
                         <button class="btn-level" onclick="setLevel('advanced')">進階</button>
                         <button class="btn-level" onclick="setLevel('pro')">高階</button>
                     </div>
-                </div>
-
-                <div id="manualSliders">
                     <div class="slider-box">
                         <div class="slider-header"><span>吸氣時間</span><span id="txtIn">4s</span></div>
                         <input type="range" id="rangeIn" min="2" max="15" value="4">
@@ -115,216 +128,225 @@
                         <input type="range" id="rangeEx" min="2" max="20" value="6">
                     </div>
                 </div>
-
-                <div id="safetyWarning" class="warning" style="display: none;">
-                    <strong>⚠️ 安全提醒：</strong> 高血壓、心臟病、青光眼、懷孕者請勿嘗試。頭暈立即停止。
-                </div>
-
-                <button class="btn btn-primary" id="startBtn" onclick="startSession()" disabled>開始練習</button>
+                <button class="btn btn-primary" id="startBtn" onclick="startSession()">開始練習</button>
             </div>
+
+            <div id="adminPanel">
+                <p style="color:var(--primary-gold); font-size:0.8rem; margin-bottom:10px;">大師管理模式</p>
+                <button onclick="generateOTP()" style="background:none; color:white; border:1px solid white; padding:5px 15px; font-size:0.8rem; border-radius:5px; cursor:pointer;">生成新一次性密碼</button>
+                <div id="otpDisplay" style="margin-top:15px; font-family:monospace; color:#0f0; font-size:1.2rem; letter-spacing:2px;"></div>
+            </div>
+            <p onclick="triggerAdmin()" style="text-align:center; font-size:0.6rem; opacity:0.2; margin-top:50px; cursor:pointer;">Creator Access</p>
         </div>
     </div>
 
-    <!-- 訓練頁面 -->
     <div id="training" class="page">
         <div class="container" style="text-align: center;">
-            <h2 id="curTitle" style="color:var(--primary-gold)">練習中</h2>
+            <h2 id="curTitle" style="color:var(--primary-gold); margin-bottom:10px;">練習中</h2>
+            <div id="instructionTxt" class="instruction-text"></div>
+            
             <div class="breathing-area">
                 <div class="breath-circle" id="circle">
                     <span class="phase-label" id="phaseTxt">準備</span>
                 </div>
+                <div class="timer-display" id="timerTxt">0</div>
             </div>
-            <div class="timer-display" id="timerTxt">0</div>
+            
             <div style="display:flex; justify-content: space-around; margin: 20px 0; opacity: 0.8;">
-                <div><small>總次數</small><div id="statCycles" style="font-size:1.5rem">0</div></div>
-                <div><small>累計時間</small><div id="statTime" style="font-size:1.5rem">0:00</div></div>
+                <div><small>總循環</small><div id="statCycles" style="font-size:1.5rem">0</div></div>
+                <div><small>總時間</small><div id="statTime" style="font-size:1.5rem">0:00</div></div>
             </div>
-            <button class="btn btn-danger" onclick="stopSession()">結束並儲存</button>
+            <button class="btn btn-danger" onclick="stopSession()">⏹️ 結束並儲存</button>
         </div>
     </div>
 
-    <!-- 紀錄頁面 -->
-    <div id="records" class="page">
-        <div class="container">
-            <h2>歷史紀錄</h2>
-            <div id="logContainer" style="margin-top:20px"></div>
+    <div id="warningOverlay" class="warning-overlay">
+        <div class="warning-box">
+            <h2 style="color:#ff4757; margin-bottom:15px;">⚠️ 安全警告</h2>
+            <p style="margin-bottom:20px; color:#ddd; font-size:0.95rem; line-height:1.5;">高血壓、心臟病、孕婦請勿嘗試屏息練習。<br>練習過程中若感到頭暈、胸悶，請立即停止並恢復自然呼吸！</p>
+            <button class="btn btn-primary" onclick="acceptWarningAndStart()">我已了解，開始挑戰</button>
+            <button class="btn" style="background:#444; color:white;" onclick="document.getElementById('warningOverlay').style.display='none'">取消返回</button>
         </div>
     </div>
 
-    <!-- 統計頁面 -->
-    <div id="stats" class="page">
-        <div class="container">
-            <h2>進度統計</h2>
-            <div style="height: 300px; margin-top: 20px;">
-                <canvas id="statChart"></canvas>
-            </div>
-        </div>
-    </div>
+    <div id="records" class="page"><div class="container"><h2>📋 歷史紀錄</h2><div id="logContainer" style="margin-top:20px"></div></div></div>
+    <div id="stats" class="page"><div class="container"><h2>📈 進度統計</h2><div style="height:300px; margin-top:20px;"><canvas id="statChart"></canvas></div></div></div>
 
     <script>
-        // ==================== Supabase 初始化 ====================
+        // --- 安全儲存防護 ---
+        const SafeStorage = {
+            mem: {},
+            set(k, v) { try { localStorage.setItem(k, v); } catch(e) { this.mem[k] = v; } },
+            get(k) { try { return localStorage.getItem(k); } catch(e) { return this.mem[k] || null; } }
+        };
+
+        // --- 初始化 Supabase ---
         const CONFIG = {
             URL: 'https://fayorxvfxtrycjiiiyfu.supabase.co',
             KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZheW9yeHZmeHRyeWNqaWlpeWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNzY1MTAsImV4cCI6MjA3OTg1MjUxMH0.7znE_AaNg6zESUO-RoSsyFqxCgcxjPT_pQiN557e6Nw'
         };
-        const supabase = window.supabase.createClient(CONFIG.URL, CONFIG.KEY);
+        let sb = null;
+        try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY, { auth: { persistSession: false } }); } catch (e) {}
 
-        // ==================== 全域狀態 ====================
+        const MASTER_PW = 'master2026';
+
+        // --- 基礎練習 ---
+        const basePractices = [
+            { id: 'b1', name: '3D腹式呼吸', desc: '腹部全方位擴張，吸氣時腹部向前、兩側、後方同時擴張。', hint: '躺平或坐直，手放腹部感受。', type: 'belly', levels: { simple: [4,6], advanced: [5,7], pro: [6,8] } },
+            { id: 'b2', name: '吸氣長度訓練', desc: '專注拉長吸氣，逐漸增加吸氣秒數。', hint: '目標從4秒逐步進步到10秒。', levels: { simple: [4,6], advanced: [6,6], pro: [10,6] } },
+            { id: 'b3', name: '吐氣長度訓練', desc: '專注拉長吐氣，啟動副交感神經。', hint: '目標從6秒逐步進步到15秒。', levels: { simple: [4,6], advanced: [4,10], pro: [4,15] } },
+            { id: 'b4', name: '1:2 呼吸法', desc: '情緒急救包，吐氣時間是吸氣的兩倍，幫助放鬆。', type: 'ratio_12', levels: { simple: [3,6], advanced: [4,8], pro: [5,10] } },
+            { id: 'b5', name: '單鼻吸氣法', desc: '右鼻吸氣提升能量、左鼻吸氣幫助放鬆。', hint: '用手指輪流按住單側鼻孔。', levels: { simple: [4,4], advanced: [6,6], pro: [8,8] } }
+        ];
+
+        // --- 進階練習 ---
+        const advPractices = [
+            { id: 'a1', name: '分段式呼吸', desc: '吸氣→屏息→吸氣→屏息→吸氣→吐氣，增加肺活量與控制力。', hint: '每個吸氣2秒、屏息2秒，最後吐氣6秒。', warn: true, seq: [{n:'吸氣', t:2, s:1.1}, {n:'Hold', t:2, s:1.1}, {n:'吸氣', t:2, s:1.3}, {n:'Hold', t:2, s:1.3}, {n:'吸氣', t:2, s:1.5}, {n:'吐氣', t:6, s:0.8}] },
+            { id: 'a2', name: '分段吐氣', desc: '吐氣→屏息→吐氣→屏息→吐氣→屏息，強化吐氣控制。', hint: '每個吐氣2秒、屏息2秒。', warn: true, seq: [{n:'吐氣', t:2, s:1.3}, {n:'Hold', t:2, s:1.3}, {n:'吐氣', t:2, s:1.1}, {n:'Hold', t:2, s:1.1}, {n:'吐氣', t:2, s:0.8}, {n:'Hold', t:2, s:0.8}] },
+            { id: 'a3', name: '4-7-8 呼吸法', desc: '吸氣4秒、屏息7秒、吐氣8秒，快速放鬆幫助入睡。', hint: '由Andrew Weil博士推廣。', seq: [{n:'吸氣 4', t:4, s:1.4}, {n:'Hold 7', t:7, s:1.4}, {n:'吐氣 8', t:8, s:0.8}] },
+            { id: 'a4', name: '延長吐氣練習', desc: '吸氣固定，吐氣越長越好，任何時候想放鬆就做。', hint: '吸氣4秒，吐氣可自行拉長。', hasSlider: true, levels: { simple: [4,6] } },
+            { id: 'a5', name: '死蟲式呼吸', desc: '躺平手腳抬起，吸氣準備，吐氣時對側手腳下放，核心收緊。', hint: '動作與呼吸協調。', seq: [{n:'吸氣準備', t:4, s:1.2}, {n:'吐氣收核心', t:6, s:0.8}] },
+            { id: 'a6', name: '平板式呼吸', desc: '維持平板支撐姿勢，穩定呼吸，吸氣4秒、吐氣6秒。', hint: '專注核心穩定，不憋氣。', seq: [{n:'吸氣', t:4, s:1}, {n:'吐氣', t:6, s:1}] },
+            { id: 'a7', name: '深蹲呼吸', desc: '下蹲過程吸氣，起身過程吐氣，配合重量訓練。', hint: '吸4秒下蹲，吐4秒起身。', seq: [{n:'下蹲吸氣', t:4, s:1.2}, {n:'起身吐氣', t:4, s:0.8}] },
+            { id: 'a8', name: '吸氣後屏息', desc: '吸飽氣後捏鼻計時，測試肺活量。', warn: true, isTest: true, seq: [{n:'吸飽氣捏鼻', t:999, s:1.5}] },
+            { id: 'a9', name: '吐氣後屏息', desc: '吐盡氣後捏鼻計時，測試耐受力。', warn: true, isTest: true, seq: [{n:'吐盡氣捏鼻', t:999, s:0.7}] },
+            { id: 'a10', name: '吸管呼吸', desc: '用吸管吸氣和吐氣，增加呼吸阻力，訓練呼吸肌。', hint: '請含著吸管慢慢呼吸。', seq: [{n:'吸管吸氣', t:4, s:1.2}, {n:'吸管吐氣', t:6, s:0.8}] },
+            { id: 'a11', name: '吹氣球練習', desc: '用一口氣慢慢吹氣球，盡量吹大。', hint: '訓練持續吐氣能力。', seq: [{n:'慢慢吹氣', t:8, s:0.6}, {n:'吸氣', t:3, s:1.1}] },
+            { id: 'a12', name: '工作深呼吸', desc: '每小時提醒深呼吸，舒緩工作壓力。', hint: '吸4秒吐6秒，重複3次。', seq: [{n:'深吸氣', t:4, s:1.4}, {n:'慢吐氣', t:6, s:0.8}] },
+            { id: 'a13', name: '跑步呼吸法', desc: '三步一吸、兩步一吐，配合跑步節奏。', hint: '吸吸吸、吐吐。', seq: [{n:'吸吸吸', t:2, s:1.3}, {n:'吐吐', t:1.5, s:0.8}] },
+            { id: 'a14', name: '重訓呼吸', desc: '用力時吐氣，放鬆時吸氣。', hint: '準備吸氣，發力吐氣。', seq: [{n:'準備', t:3, s:1.2}, {n:'發力', t:3, s:0.8}] },
+            { id: 'a15', name: '睡前放鬆組合', desc: '先做4-7-8呼吸法4次，然後左側臥放鬆5分鐘。', hint: '幫助入睡。', seq: [{n:'4-7-8呼吸', t:19, s:1.2}, {n:'左側臥放鬆', t:60, s:1.0}] }
+        ];
+
         let state = {
-            sel: null,
-            level: 'simple',
+            unlocked: SafeStorage.get('adv_unlocked') === 'true',
+            voiceEnabled: SafeStorage.get('voice_enabled') !== 'false',
+            sel: null, isBase: true, level: 'simple',
             in: 4, ex: 6,
-            isRun: false,
-            sec: 0, pSec: 0,
-            phase: 'in',
-            cycles: 0,
-            timer: null,
-            phaseQueue: [],
-            phaseIndex: 0,
-            totalPhases: 0,
-            safetyAcknowledged: false,
-            advancedUnlocked: localStorage.getItem('advanced_unlocked') === 'true'
+            timer: null, sec: 0, pSec: 0, phase: 0, cycles: 0, currSeq: []
         };
+        let myChart = null;
 
-        // ==================== 練習資料庫 ====================
-        const basicPractices = [
-            { id: 1, name: '3D腹式呼吸', desc: '腹部全方位擴張', type: 'belly', levels: { simple: [4,6], advanced: [5,7], pro: [6,8] } },
-            { id: 2, name: '吸氣長度訓練', desc: '強化吸氣深度', type: 'length_in', levels: { simple: [4,6], advanced: [6,6], pro: [10,6] } },
-            { id: 3, name: '吐氣長度訓練', desc: '強化副交感神經', type: 'length_out', levels: { simple: [4,6], advanced: [4,10], pro: [4,15] } },
-            { id: 4, name: '1:2 呼吸法', desc: '情緒急救包', type: 'ratio_12', levels: { simple: [3,6], advanced: [4,8], pro: [5,10] } },
-            { id: 5, name: '單鼻吸氣法', desc: '右鼻(能量)/左鼻(放鬆)', type: 'single', levels: { simple: [4,4], advanced: [6,6], pro: [8,8] } }
-        ];
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGrids();
+            setupInputs();
+            updateVoiceBtnUI();
+        });
 
-        const advancedPractices = [
-            { id: 101, name: '分段式呼吸', desc: '吸→停→吸→停→吸→吐', type: 'segmented_in', hasHold: true, requiresSafety: false },
-            { id: 102, name: '分段吐氣', desc: '吐→停→吐→停→吐→停', type: 'segmented_out', hasHold: true, requiresSafety: false },
-            { id: 103, name: '4-7-8 呼吸法', desc: '吸4屏7吐8', type: '478', hasHold: true, requiresSafety: false },
-            { id: 104, name: '延長吐氣練習', desc: '吸氣固定，吐氣越長越好', type: 'extend_exhale', hasHold: false, requiresSafety: false },
-            { id: 105, name: '死蟲式呼吸', desc: '吐氣時核心收緊', type: 'deadbug', hasHold: false, requiresSafety: false },
-            { id: 106, name: '平板式呼吸', desc: '穩定核心中平穩呼吸', type: 'plank', hasHold: false, requiresSafety: false },
-            { id: 107, name: '深蹲呼吸', desc: '下蹲吸氣，起身吐氣', type: 'squat', hasHold: false, requiresSafety: false },
-            { id: 108, name: '吸氣後屏息', desc: '吸飽氣後捏鼻計時', type: 'hold_in', hasHold: true, requiresSafety: true },
-            { id: 109, name: '吐氣後屏息', desc: '吐盡氣後捏鼻計時', type: 'hold_out', hasHold: true, requiresSafety: true },
-            { id: 110, name: '吸管呼吸', desc: '用吸管增加阻力', type: 'straw', hasHold: false, requiresSafety: false },
-            { id: 111, name: '吹氣球練習', desc: '一口氣慢慢吹氣球', type: 'balloon', hasHold: false, requiresSafety: false },
-            { id: 112, name: '工作時深呼吸', desc: '每小時提醒', type: 'work', hasHold: false, requiresSafety: false },
-            { id: 113, name: '跑步呼吸法', desc: '三步一吸、兩步一吐', type: 'running', hasHold: false, requiresSafety: false },
-            { id: 114, name: '重量訓練呼吸', desc: '用力時吐氣', type: 'weight', hasHold: false, requiresSafety: false },
-            { id: 115, name: '睡前放鬆組合', desc: '4-7-8四次+左側臥', type: 'sleep', hasHold: true, requiresSafety: false }
-        ];
+        // --- 語音功能模組 (廣東話) ---
+        function updateVoiceBtnUI() {
+            document.getElementById('voiceBtn').innerText = state.voiceEnabled ? '🔊 語音' : '🔇 靜音';
+        }
 
-        const allPractices = [...basicPractices, ...advancedPractices];
-
-        // ==================== 一次性密碼驗證 (Supabase版) ====================
-        async function verifyPassword() {
-            const code = document.getElementById('unlockPassword').value.trim();
-            if (!code) return;
-
-            // 1. 查詢有沒有這組密碼且 is_used = false
-            const { data, error } = await supabase
-                .from('breathing_otps')
-                .select('id')
-                .eq('code', code)
-                .eq('is_used', false)
-                .maybeSingle();
-
-            if (error || !data) {
-                alert('❌ 密碼無效或已經被使用過了！');
-                return;
+        function toggleVoice() {
+            state.voiceEnabled = !state.voiceEnabled;
+            SafeStorage.set('voice_enabled', state.voiceEnabled);
+            updateVoiceBtnUI();
+            
+            if (!state.voiceEnabled && window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            } else {
+                speak('語音導航已開啟');
             }
-
-            // 2. 把這組密碼標記為已使用
-            const { error: updateError } = await supabase
-                .from('breathing_otps')
-                .update({ is_used: true })
-                .eq('id', data.id);
-
-            if (updateError) {
-                console.error(updateError);
-                alert('伺服器錯誤，請稍後再試');
-                return;
-            }
-
-            // 3. 解鎖成功
-            state.advancedUnlocked = true;
-            localStorage.setItem('advanced_unlocked', 'true');
-            closeModal();
-            showAdvancedSection();
-            alert('✅ 解鎖成功！現在可以使用進階練習了。');
         }
 
-        function closeModal() {
-            document.getElementById('passwordModal').style.display = 'none';
+        function speak(text) {
+            if (!state.voiceEnabled || !window.speechSynthesis) return;
+            
+            window.speechSynthesis.cancel(); // 中斷前一個語音
+            
+            let cleanText = text.replace(/Hold \d+/gi, 'hold住').replace(/Hold/gi, 'hold住').replace(/^H$/, 'hold住');
+            
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'zh-HK'; // 廣東話
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
         }
 
-        function showPasswordModal() {
-            if (state.advancedUnlocked) {
-                showAdvancedSection();
-                return;
-            }
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        function showAdvancedSection() {
-            document.getElementById('advancedSection').style.display = 'block';
-            document.getElementById('unlockButtonContainer').style.display = 'none';
-            renderAdvancedList();
-        }
-
-        // ==================== 渲染列表 ====================
-        function renderBasicList() {
-            const container = document.getElementById('basicPracticeList');
-            container.innerHTML = basicPractices.map(p => `
-                <div class="practice-card" onclick="selectPractice(${p.id})">
-                    <h3>${p.name}</h3>
-                    <p>${p.desc}</p>
+        // --- UI 與網格渲染 ---
+        function renderGrids() {
+            const bGrid = document.getElementById('basicGrid');
+            const aGrid = document.getElementById('advGrid');
+            
+            bGrid.innerHTML = basePractices.map(p => `<div class="practice-card" onclick="selectPractice('${p.id}', false)"><h3>${p.name}</h3><p>${p.desc.substring(0,20)}...</p></div>`).join('');
+            
+            aGrid.innerHTML = advPractices.map(p => `
+                <div class="practice-card ${state.unlocked ? '' : 'locked'}" onclick="${state.unlocked ? `selectPractice('${p.id}', true)` : 'handleUnlock()'}">
+                    <h3>${p.name}</h3><p>${p.desc.substring(0,20)}...</p>
                 </div>
             `).join('');
+
+            document.getElementById('unlockArea').style.display = state.unlocked ? 'none' : 'block';
+            document.getElementById('lockStatus').innerText = state.unlocked ? '🔓 已解鎖' : '🔒 點擊解鎖';
         }
 
-        function renderAdvancedList() {
-            const container = document.getElementById('advancedPracticeList');
-            if (!state.advancedUnlocked) {
-                container.innerHTML = advancedPractices.map(p => `
-                    <div class="practice-card locked" onclick="alert('請先解鎖進階練習')">
-                        <h3>${p.name}</h3>
-                        <p>${p.desc}</p>
-                    </div>
-                `).join('');
+        async function handleUnlock() {
+            const code = prompt("請輸入解鎖密碼 (一次性密碼)：\n(解鎖)");
+            if (!code) return;
+            if (code === 'breath2026') { unlockSuccess(); return; }
+
+            if (sb) {
+                const { data } = await sb.from('breathing_otps').select('*').eq('code', code).eq('is_used', false).single();
+                if (data) {
+                    await sb.from('breathing_otps').update({ is_used: true }).eq('code', code);
+                    unlockSuccess();
+                } else {
+                    alert("密碼無效或已被使用。");
+                }
             } else {
-                container.innerHTML = advancedPractices.map(p => `
-                    <div class="practice-card" onclick="selectPractice(${p.id})">
-                        <h3>${p.name}</h3>
-                        <p>${p.desc}</p>
-                    </div>
-                `).join('');
+                alert("無法連線至驗證伺服器，請使用預設密碼 ");
             }
         }
 
-        // ==================== 練習選擇與控制 ====================
-        function selectPractice(id) {
-            state.sel = allPractices.find(p => p.id === id);
+        function unlockSuccess() {
+            state.unlocked = true;
+            SafeStorage.set('adv_unlocked', 'true');
+            alert("進階練習已永久解鎖！");
+            renderGrids();
+        }
+
+        function triggerAdmin() {
+            const p = prompt("Creator Password:");
+            if(p === MASTER_PW) document.getElementById('adminPanel').style.display = 'block';
+        }
+        
+        async function generateOTP() {
+            const code = 'B-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            if(sb) await sb.from('breathing_otps').insert([{ code: code }]);
+            document.getElementById('otpDisplay').innerText = code;
+        }
+
+        function selectPractice(id, isAdv) {
+            state.isBase = !isAdv;
+            state.sel = (isAdv ? advPractices : basePractices).find(p => p.id === id);
+            
             document.querySelectorAll('.practice-card').forEach(c => c.classList.remove('selected'));
             event.currentTarget.classList.add('selected');
 
             document.getElementById('controlPanel').style.display = 'block';
-
-            if (state.sel.requiresSafety) {
-                document.getElementById('safetyWarning').style.display = 'block';
-                state.safetyAcknowledged = false;
+            
+            // 顯示練習詳細說明
+            const detailDiv = document.getElementById('practiceDetail');
+            const detailText = document.getElementById('detailText');
+            if (state.sel) {
+                let detail = state.sel.desc;
+                if (state.sel.hint) detail += '。' + state.sel.hint;
+                detailText.innerText = detail;
+                detailDiv.style.display = 'block';
             } else {
-                document.getElementById('safetyWarning').style.display = 'none';
-                state.safetyAcknowledged = true;
+                detailDiv.style.display = 'none';
             }
 
-            if (state.sel.levels) {
-                setLevel(state.level);
+            const baseControls = document.getElementById('baseControls');
+            
+            if (state.isBase || state.sel.hasSlider) {
+                baseControls.style.display = 'block';
+                setLevel('simple');
             } else {
-                state.in = 4; state.ex = 6;
-                updateSliderUI();
+                baseControls.style.display = 'none';
             }
 
-            document.getElementById('startBtn').disabled = false;
             document.getElementById('startBtn').innerText = `開始「${state.sel.name}」`;
         }
 
@@ -333,12 +355,24 @@
             document.querySelectorAll('.btn-level').forEach(b => {
                 b.classList.toggle('active', b.innerText === (lv==='simple'?'簡單':lv==='advanced'?'進階':'高階'));
             });
-            if (state.sel && state.sel.levels) {
-                const vals = state.sel.levels[lv];
-                state.in = vals[0];
-                state.ex = vals[1];
+            const vals = state.sel.levels[lv];
+            state.in = vals[0];
+            state.ex = vals[1];
+            updateSliderUI();
+        }
+
+        function setupInputs() {
+            const rIn = document.getElementById('rangeIn');
+            const rEx = document.getElementById('rangeEx');
+            rIn.oninput = (e) => {
+                state.in = parseInt(e.target.value);
+                if (state.sel && state.sel.type === 'ratio_12') state.ex = state.in * 2;
                 updateSliderUI();
-            }
+            };
+            rEx.oninput = (e) => {
+                state.ex = parseInt(e.target.value);
+                updateSliderUI();
+            };
         }
 
         function updateSliderUI() {
@@ -348,208 +382,137 @@
             document.getElementById('txtEx').innerText = state.ex + 's';
         }
 
-        document.getElementById('rangeIn').oninput = (e) => {
-            state.in = parseInt(e.target.value);
-            if (state.sel && state.sel.type === 'ratio_12') {
-                state.ex = state.in * 2;
-            }
-            updateSliderUI();
-        };
-        document.getElementById('rangeEx').oninput = (e) => {
-            state.ex = parseInt(e.target.value);
-            updateSliderUI();
-        };
-
-        // ==================== 訓練核心 ====================
+        // --- 核心練習引擎 (修復版) ---
         function startSession() {
-            if (state.sel.requiresSafety && !state.safetyAcknowledged) {
-                if (!confirm('⚠️ 此練習有安全風險，請確定身體狀況允許。')) return;
-                state.safetyAcknowledged = true;
+            if (state.sel.warn) document.getElementById('warningOverlay').style.display = 'flex';
+            else launchEngine();
+        }
+        
+        function acceptWarningAndStart() {
+            document.getElementById('warningOverlay').style.display = 'none';
+            launchEngine();
+        }
+
+        function launchEngine() {
+            // 先清除可能存在的舊計時器
+            if (state.timer) {
+                clearInterval(state.timer);
+                state.timer = null;
             }
 
             showPage('training');
-            state.isRun = true;
-            state.sec = 0; state.pSec = 0; state.cycles = 0; state.phase = 'in';
-            state.phaseQueue = []; state.phaseIndex = 0;
-
             document.getElementById('curTitle').innerText = state.sel.name;
-            document.getElementById('circle').className = 'breath-circle' + (state.sel.type === 'belly' ? ' belly-mode' : '');
+            
+            const inst = document.getElementById('instructionTxt');
+            if(state.sel.hint) { inst.innerText = state.sel.hint; inst.style.display = 'block'; }
+            else { inst.style.display = 'none'; }
 
-            initPhaseQueue();
-            runCycle();
+            document.getElementById('circle').className = 'breath-circle' + (state.sel.type === 'belly' ? ' belly-mode' : '');
+            
+            if (state.isBase || state.sel.hasSlider) {
+                state.currSeq = [{n:'吸氣', t:state.in, s:1.5}, {n:'吐氣', t:state.ex, s:0.8}];
+            } else {
+                state.currSeq = state.sel.seq;
+            }
+
+            state.sec = 0; state.pSec = 0; state.phase = 0; state.cycles = 0;
+            document.getElementById('statCycles').innerText = '0';
+            
+            // 語音：歡迎詞 + 第一階段
+            const firstPhaseText = state.currSeq[0].n;
+            speak(`開始 ${state.sel.name} 練習。${firstPhaseText}`);
+            
+            runPhase(true);
             state.timer = setInterval(tick, 1000);
         }
 
-        function initPhaseQueue() {
-            const type = state.sel.type;
-            if (type === 'segmented_in') {
-                state.phaseQueue = [
-                    { name: '吸氣', duration: 2, action: 'inhale' },
-                    { name: 'hold', duration: 2, action: 'hold' },
-                    { name: '吸氣', duration: 2, action: 'inhale' },
-                    { name: 'hold', duration: 2, action: 'hold' },
-                    { name: '吸氣', duration: 2, action: 'inhale' },
-                    { name: '吐氣', duration: 6, action: 'exhale' }
-                ];
-            } else if (type === 'segmented_out') {
-                state.phaseQueue = [
-                    { name: '吐氣', duration: 2, action: 'exhale' },
-                    { name: 'hold', duration: 2, action: 'hold' },
-                    { name: '吐氣', duration: 2, action: 'exhale' },
-                    { name: 'hold', duration: 2, action: 'hold' },
-                    { name: '吐氣', duration: 2, action: 'exhale' },
-                    { name: 'hold', duration: 2, action: 'hold' }
-                ];
-            } else if (type === '478') {
-                state.phaseQueue = [
-                    { name: '吸氣', duration: 4, action: 'inhale' },
-                    { name: 'hold', duration: 7, action: 'hold' },
-                    { name: '吐氣', duration: 8, action: 'exhale' }
-                ];
-            } else if (type === 'extend_exhale') {
-                state.phaseQueue = [
-                    { name: '吸氣', duration: 4, action: 'inhale' },
-                    { name: '吐氣', duration: state.ex, action: 'exhale' }
-                ];
-            } else if (type === 'hold_in') {
-                state.phaseQueue = [
-                    { name: '吸氣', duration: state.in, action: 'inhale' },
-                    { name: 'hold', duration: 0, action: 'hold' }
-                ];
-            } else if (type === 'hold_out') {
-                state.phaseQueue = [
-                    { name: '吐氣', duration: state.ex, action: 'exhale' },
-                    { name: 'hold', duration: 0, action: 'hold' }
-                ];
-            } else if (type === 'deadbug') {
-                state.phaseQueue = [
-                    { name: '吸氣準備', duration: state.in, action: 'inhale' },
-                    { name: '吐氣收核心', duration: state.ex, action: 'exhale' }
-                ];
-            } else if (type === 'plank') {
-                state.phaseQueue = [
-                    { name: '穩定吸氣', duration: state.in, action: 'inhale' },
-                    { name: '穩定吐氣', duration: state.ex, action: 'exhale' }
-                ];
-            } else if (type === 'squat') {
-                state.phaseQueue = [
-                    { name: '下蹲吸氣', duration: state.in, action: 'inhale' },
-                    { name: '起身吐氣', duration: state.ex, action: 'exhale' }
-                ];
-            } else if (type === 'straw') {
-                state.phaseQueue = [ { name: '用吸管呼吸', duration: 180, action: 'none' } ];
-            } else if (type === 'balloon') {
-                state.phaseQueue = [ { name: '一口氣吹氣球', duration: 0, action: 'none' } ];
-            } else if (type === 'work') {
-                state.phaseQueue = [ { name: '深呼吸', duration: 3, action: 'inhale' }, { name: '吐氣', duration: 6, action: 'exhale' } ];
-            } else if (type === 'running') {
-                state.phaseQueue = [
-                    { name: '吸', duration: 1, action: 'inhale' },
-                    { name: '吸', duration: 1, action: 'inhale' },
-                    { name: '吸', duration: 1, action: 'inhale' },
-                    { name: '吐', duration: 1, action: 'exhale' },
-                    { name: '吐', duration: 1, action: 'exhale' }
-                ];
-            } else if (type === 'weight') {
-                state.phaseQueue = [
-                    { name: '準備吸氣', duration: state.in, action: 'inhale' },
-                    { name: '用力吐氣', duration: state.ex, action: 'exhale' }
-                ];
-            } else if (type === 'sleep') {
-                state.phaseQueue = [
-                    { name: '吸氣', duration: 4, action: 'inhale' },
-                    { name: 'hold', duration: 7, action: 'hold' },
-                    { name: '吐氣', duration: 8, action: 'exhale' }
-                ];
-                state.sleepRepeat = 4;
-            } else {
-                state.phaseQueue = [
-                    { name: '吸氣', duration: state.in, action: 'inhale' },
-                    { name: '吐氣', duration: state.ex, action: 'exhale' }
-                ];
-            }
-            state.totalPhases = state.phaseQueue.length;
-            state.phaseIndex = 0;
-        }
-
         function tick() {
-            state.sec++;
-            state.pSec++;
-
-            const phase = state.phaseQueue[state.phaseIndex];
-            if (!phase) return;
-
-            const target = phase.duration;
-            if (target > 0) {
-                document.getElementById('timerTxt').innerText = Math.max(0, target - state.pSec);
-            } else {
-                document.getElementById('timerTxt').innerText = state.pSec;
-            }
+            state.sec++; state.pSec++;
+            const seq = state.currSeq[state.phase];
 
             const m = Math.floor(state.sec / 60);
             const s = state.sec % 60;
             document.getElementById('statTime').innerText = `${m}:${s.toString().padStart(2, '0')}`;
 
-            if (target > 0 && state.pSec >= target) {
-                state.pSec = 0;
-                state.phaseIndex++;
-                if (state.phaseIndex >= state.totalPhases) {
-                    if (state.sel.type === 'sleep' && state.sleepRepeat > 1) {
-                        state.sleepRepeat--;
-                        state.phaseIndex = 0;
-                    } else {
+            if (state.sel.isTest) {
+                document.getElementById('timerTxt').innerText = state.pSec;
+            } else {
+                const remain = seq.t - state.pSec;
+                document.getElementById('timerTxt').innerText = Math.max(0, remain);
+                
+                // 倒數語音 (僅在練習進行中)
+                if (remain <= 5 && remain > 0) {
+                    speak(remain.toString());
+                }
+
+                if (state.pSec >= seq.t) {
+                    state.pSec = 0;
+                    state.phase++;
+                    if (state.phase >= state.currSeq.length) {
+                        state.phase = 0;
                         state.cycles++;
                         document.getElementById('statCycles').innerText = state.cycles;
-                        state.phaseIndex = 0;
                     }
+                    runPhase();
                 }
-                runCycle();
             }
         }
 
-        function runCycle() {
-            if (state.phaseIndex >= state.totalPhases) state.phaseIndex = 0;
-            const phase = state.phaseQueue[state.phaseIndex];
-            if (!phase) return;
-
+        function runPhase(isFirst = false) {
+            const seq = state.currSeq[state.phase];
+            document.getElementById('phaseTxt').innerText = seq.n;
             const circle = document.getElementById('circle');
-            const txt = document.getElementById('phaseTxt');
-            txt.innerText = phase.name;
-
-            if (phase.action === 'inhale') {
-                circle.style.transition = `transform ${phase.duration}s linear`;
-                circle.style.transform = 'scale(1.5)';
-            } else if (phase.action === 'exhale') {
-                circle.style.transition = `transform ${phase.duration}s linear`;
-                circle.style.transform = 'scale(0.8)';
-            } else if (phase.action === 'hold') {
-                circle.style.transition = 'none';
-            }
-            if (phase.duration > 0) {
-                document.getElementById('timerTxt').innerText = phase.duration;
-            } else {
-                document.getElementById('timerTxt').innerText = '0';
+            circle.style.transition = `transform ${state.sel.isTest ? 0.5 : seq.t}s linear`;
+            circle.style.transform = `scale(${seq.s})`;
+            
+            if (!isFirst && !state.sel.isTest) {
+                speak(seq.n);
             }
         }
 
         async function stopSession() {
-            clearInterval(state.timer);
+            // 停止計時器
+            if (state.timer) {
+                clearInterval(state.timer);
+                state.timer = null;
+            }
+
+            // 強制中斷所有語音
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+
+            // 語音：結束鼓勵語 (但需確保在 cancel 後播放)
+            speak('練習完成，你好棒！');
+            
+            const notes = state.sel.isTest ? `極限屏息: ${state.pSec}秒` : `完成 ${state.cycles} 循環`;
             const record = {
-                practice_name: state.sel.name,
-                duration_seconds: state.sec,
-                cycles: state.cycles,
-                notes: `吸${state.in}/吐${state.ex} (${state.level})`,
-                created_at: new Date().toISOString()
+                practice_name: state.sel.name, duration_seconds: state.sec, cycles: state.cycles, notes: notes, created_at: new Date().toISOString()
             };
-            const logs = JSON.parse(localStorage.getItem('breath_logs_v2') || '[]');
+
+            const logs = JSON.parse(SafeStorage.get('breath_logs_pro') || '[]');
             logs.unshift(record);
-            localStorage.setItem('breath_logs_v2', JSON.stringify(logs.slice(0, 50)));
-            await supabase.from('practice_records').insert([record]);
-            alert('練習完成！');
+            SafeStorage.set('breath_logs_pro', JSON.stringify(logs.slice(0, 50)));
+
+            if (sb) await sb.from('practice_records').insert([record]);
+
+            alert(`練習完成！\n${notes}`);
             showPage('home');
         }
 
+        // 修正 showPage：當從訓練頁返回首頁時，強制停止訓練並取消語音
         function showPage(id) {
+            // 如果要切換到首頁，且目前正在訓練中（計時器存在），則強制停止訓練（不儲存）
+            if (id === 'home' && state.timer) {
+                clearInterval(state.timer);
+                state.timer = null;
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+                // 重置計時狀態（避免下次開始時殘留）
+                state.sec = 0; state.pSec = 0; state.phase = 0; state.cycles = 0;
+            }
+
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => {
@@ -561,59 +524,30 @@
 
         function loadLogs() {
             const container = document.getElementById('logContainer');
-            const logs = JSON.parse(localStorage.getItem('breath_logs_v2') || '[]');
-            if (!logs.length) {
-                container.innerHTML = '<p style="text-align:center; opacity:0.5;">尚無紀錄</p>';
-                return;
-            }
+            const logs = JSON.parse(SafeStorage.get('breath_logs_pro') || '[]');
+            if (!logs.length) { container.innerHTML = '<p style="text-align:center; opacity:0.5;">尚無紀錄</p>'; return; }
+
             container.innerHTML = logs.map(l => `
                 <div class="log-item">
-                    <div>
-                        <div style="font-weight:bold">${l.practice_name}</div>
-                        <small style="opacity:0.6">${new Date(l.created_at).toLocaleDateString()} · ${l.notes}</small>
-                    </div>
-                    <div style="text-align:right">
-                        <div style="color:var(--primary-gold)">${l.cycles} 回</div>
-                        <small>${Math.floor(l.duration_seconds/60)}分${l.duration_seconds%60}秒</small>
-                    </div>
+                    <div><div style="font-weight:bold; color:var(--primary-gold)">${l.practice_name}</div><small style="opacity:0.6">${new Date(l.created_at).toLocaleString()}</small></div>
+                    <div style="text-align:right"><div>${l.notes}</div><small>${Math.floor(l.duration_seconds/60)}分${l.duration_seconds%60}秒</small></div>
                 </div>
             `).join('');
         }
 
-        let myChart = null;
         function renderChart() {
             const ctx = document.getElementById('statChart').getContext('2d');
-            const logs = JSON.parse(localStorage.getItem('breath_logs_v2') || '[]').reverse();
+            const logs = JSON.parse(SafeStorage.get('breath_logs_pro') || '[]').reverse();
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: logs.map(l => new Date(l.created_at).getDate() + '日'),
-                    datasets: [{
-                        label: '練習循環數',
-                        data: logs.map(l => l.cycles),
-                        borderColor: '#ffd700',
-                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    datasets: [{ label: '練習時間(秒)', data: logs.map(l => l.duration_seconds), borderColor: '#ffd700', backgroundColor: 'rgba(255, 215, 0, 0.1)', fill: true, tension: 0.4 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                        x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } }
             });
         }
-
-        window.onload = () => {
-            renderBasicList();
-            renderAdvancedList();
-            if (state.advancedUnlocked) showAdvancedSection();
-        };
     </script>
 </body>
 </html>
