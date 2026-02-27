@@ -282,6 +282,32 @@
         }
 
         async function handleUnlock() {
+            const code = prompt("請輸入解鎖密碼：");
+            if (!code) return;
+
+        if (sb) {
+            const { data } = await sb
+               .from('breathing_otps')
+               .select('*')
+               .eq('code', code)
+               .eq('is_used', false)
+               .single();
+            
+        if (data) {
+            await sb
+                .from('breathing_otps')
+                .update({ is_used: true })
+                .eq('code', code);
+                
+            unlockSuccess();
+        } else {
+            alert("密碼無效或已被使用。");
+        }
+    } else {
+        alert("無法連線至驗證伺服器");
+    }
+}
+        
             const code = prompt("請輸入解鎖密碼 (一次性密碼)：\n(解鎖)");
             if (!code) return;
             if (code === 'breath2026') { unlockSuccess(); return; }
