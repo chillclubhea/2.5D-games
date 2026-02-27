@@ -326,9 +326,27 @@
         }
         
         async function generateOTP() {
+            // 生成新密碼 (格式：B-XXXXXX)
             const code = 'B-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-            if(sb) await sb.from('breathing_otps').insert([{ code: code }]);
+            
+            // 顯示在畫面上
             document.getElementById('otpDisplay').innerText = code;
+            
+            // 存入 Supabase 資料庫
+            if (sb) {
+                const { error } = await sb
+                    .from('breathing_otps')
+                    .insert([{ code: code }]);
+                
+                if (error) {
+                    console.error('儲存失敗:', error);
+                    alert('❌ 密碼生成成功但存入資料庫失敗，請稍後再試');
+                } else {
+                    alert(`✅ 新密碼已生成：${code}\n（已存入資料庫，可以使用）`);
+                }
+            } else {
+                alert('⚠️ 無法連線資料庫，密碼僅顯示未儲存');
+            }
         }
 
         function selectPractice(id, isAdv) {
