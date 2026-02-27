@@ -282,31 +282,37 @@
         }
 
         async function handleUnlock() {
-            const code = prompt("請輸入解鎖密碼：");
-            if (!code) return;
+    const code = prompt("請輸入解鎖密碼 (一次性密碼)：");
+    if (!code) return;
 
-        if (sb) {
-            const { data } = await sb
-               .from('breathing_otps')
-               .select('*')
-               .eq('code', code)
-               .eq('is_used', false)
-               .single();
-            
+    if (!sb) {
+        alert("無法連線至驗證伺服器");
+        return;
+    }
+
+    try {
+        const { data } = await sb
+            .from('breathing_otps')
+            .select('id')
+            .eq('code', code)
+            .eq('is_used', false)
+            .single();
+
         if (data) {
             await sb
                 .from('breathing_otps')
                 .update({ is_used: true })
-                .eq('code', code);
-                
+                .eq('id', data.id);
+
             unlockSuccess();
         } else {
-            alert("密碼無效或已被使用。");
+            alert("❌ 密碼無效或已經被使用過了！");
         }
-    } else {
-        alert("無法連線至驗證伺服器");
+    } catch (error) {
+        alert("驗證過程發生錯誤");
     }
 }
+
         
             const code = prompt("請輸入解鎖密碼 (一次性密碼)：\n(解鎖)");
             if (!code) return;
