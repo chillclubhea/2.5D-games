@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>下肢生物力學 · 康復整合方案 | 苗振體系</title>
+    <style>
+        /* ===== RESET & 全局設定 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafbfc;
+            color: #1e2b37;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        /* 舒壓配色 */
+        :root {
+            --primary-deep: #2c3e50;      /* 深灰藍 - 標題/重點 */
+            --accent-teal: #2ecc71;        /* 柔和藍綠 - 點綴/強調 */
+            --accent-blue: #3498db;         /* 輔助藍 - 引用/細節 */
+            --soft-bg: #f9fbfd;              /* 背景淺灰 */
+            --card-white: #ffffff;
+            --border-light: #e9ecf0;
+            --text-main: #2e3b4e;
+            --text-soft: #5a6b7b;
+            --golden-quote: #f6f9fc;
+            --block-bar: #3498db;
+        }
+
+        /* 排版容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ===== 固定導覽列 ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.02);
+            z-index: 1000;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-container a {
+            color: var(--primary-deep);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.02rem;
+            padding: 0.3rem 0;
+            border-bottom: 2px solid transparent;
+            transition: border 0.2s, color 0.2s;
+        }
+
+        .nav-container a:hover {
+            border-bottom-color: var(--accent-teal);
+            color: var(--accent-teal);
+        }
+
+        /* 內容偏移 (抵銷fixed navbar) */
+        .section-offset {
+            scroll-margin-top: 75px;
+        }
+
+        /* ===== 版式元素 ===== */
+        section {
+            padding: 3.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 600;
+            letter-spacing: -0.02rem;
+            line-height: 1.2;
+            color: var(--primary-deep);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: 0.03rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-teal);
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--primary-deep);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 1.8rem 0 1rem;
+            color: var(--primary-deep);
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.2rem 0 0.5rem;
+            color: #2c3e50;
+        }
+
+        .subhead {
+            font-weight: 500;
+            color: var(--text-soft);
+            letter-spacing: 0.02rem;
+            margin-top: -0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* 關鍵詞標記 */
+        strong, b {
+            color: var(--primary-deep);
+            font-weight: 600;
+        }
+
+        .tag {
+            background-color: #e8f0fe;
+            color: var(--accent-blue);
+            font-weight: 500;
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-right: 0.3rem;
+        }
+
+        .highlight-bg {
+            background-color: #f0f9ff;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #1e4660;
+        }
+
+        /* 金句區塊 (左側邊框) */
+        .quote-block {
+            background-color: var(--golden-quote);
+            border-left: 6px solid var(--block-bar);
+            padding: 1.2rem 2rem;
+            margin: 1.8rem 0;
+            border-radius: 0 12px 12px 0;
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: #2c3e50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .quote-block p {
+            margin-bottom: 0.5rem;
+            font-style: normal;
+        }
+
+        .quote-author {
+            font-weight: 500;
+            color: var(--accent-blue);
+            text-align: right;
+        }
+
+        /* 卡片設計 (SOP流程、訓練步驟) */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: var(--card-white);
+            border-radius: 20px;
+            padding: 1.8rem 1.5rem;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-light);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -8px rgba(46, 204, 113, 0.12);
+        }
+
+        .card h4 {
+            margin-top: 0;
+            border-left: 4px solid var(--accent-teal);
+            padding-left: 1rem;
+        }
+
+        .step-timeline {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px dashed var(--border-light);
+            margin-left: 0.5rem;
+        }
+
+        .step-item {
+            margin-bottom: 2rem;
+            padding: 1.2rem 1.5rem;
+            background-color: var(--card-white);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            transition: box-shadow 0.2s;
+        }
+
+        .step-item:hover {
+            box-shadow: 0 8px 18px rgba(52,152,219,0.08);
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--primary-deep);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-title::before {
+            content: "⚕️";
+            margin-right: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .logic-badge {
+            display: inline-block;
+            background-color: #eef9f2;
+            color: var(--accent-teal);
+            font-weight: 500;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            letter-spacing: 0.03rem;
+            margin: 0.5rem 0 0.2rem;
+            border: 1px solid #d0ebd8;
+        }
+
+        /* 數據/角度特殊標註 */
+        .data-num {
+            font-weight: 600;
+            background: #ecf9f0;
+            color: #1f8b4c;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        /* 響應式細調 */
+        @media (max-width: 680px) {
+            h1 { font-size: 2rem; }
+            .navbar { padding: 0.6rem 0; }
+            .nav-container { gap: 0.8rem; }
+            .nav-container a { font-size: 0.8rem; }
+        }
+
+        /* footer */
+        .footer-note {
+            text-align: center;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            padding: 2rem 0 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* 輔助按鈕 */
+        .btn-soft {
+            background-color: transparent;
+            border: 1px solid var(--accent-teal);
+            color: var(--accent-teal);
+            border-radius: 40px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.9rem;
+            cursor: default;
+            transition: 0.1s;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 固定導覽列 -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#core">核心總論</a>
+            <a href="#assess">科學評估</a>
+            <a href="#pelvis">骨盆基礎</a>
+            <a href="#hip-knee">髖膝關節</a>
+            <a href="#foot">足踝根基</a>
+            <a href="#training">腿型訓練</a>
+            <a href="#holistic">整體視角</a>
+        </div>
+    </nav>
+
+    <main class="container" style="margin-top: 80px;">
+        <!-- 大標題 -->
+        <section id="core" class="section-offset" style="padding-top: 2rem;">
+            <h1 style="font-size: 2.4rem;">🧬 下肢生物力學<br>從足踝評估到腿型矯正的整體整合方案</h1>
+            <div class="subhead">苗振體系 · 臨床推理與實操 SOP</div>
+            <div class="quote-block">
+                <p>肉眼所見的腿型異常（X/O/XO型），絕大多數是全身肌肉骨骼系統為適應失衡而呈現的「代償結果」，而非單純的骨骼結構問題。真正的解決之道，在於透過精準評估找出力學鏈的斷裂點——「父母」（跟骨與坐骨），並透過系統性訓練重建由下而上的穩定與功能。</p>
+            </div>
+        </section>
+
+        <!-- 第一部分：科學評估 -->
+        <section id="assess" class="section-offset">
+            <h2>🔍 第一部分：科學評估——辨識「真/假」腿型</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🦵 正常腿型標準</h4>
+                    <p>四大接觸點：①大腿內側 ②膝關節內側 ③小腿肚 ④腳踝內側 — 形成三大自然縫隙。</p>
+                    <p><span class="tag">X型</span> 大腿/膝能併攏，腳踝無法併攏。<br>
+                    <span class="tag">O型</span> 腳踝/大腿內側能併，膝/小腿肚無法併。<br>
+                    <span class="tag">XO型</span> 唯獨小腿肚無法併攏。</p>
+                </div>
+                <div class="card">
+                    <h4>🧪 功能性預判測試</h4>
+                    <p><span class="highlight-bg">O型根源</span> 站立微屈膝 → 膝能輕鬆併攏 → 骨盆周邊問題（3-5天可改善）。</p>
+                    <p><span class="highlight-bg">XO型根源</span> 坐姿小腿能併攏 → 足踝周邊問題（5-7天改善）。</p>
+                    <p><span class="highlight-bg">「假O真X」核心</span> 肉眼O但膝蓋內扣＋扁平足/拇外翻 → 極度內旋＋膝超伸。若夾磚練內收肌會越練越糟。</p>
+                </div>
+                <div class="card">
+                    <h4>👪 父母-孩子模型</h4>
+                    <p><strong>父母：</strong>坐骨＋跟骨；<strong>孩子：</strong>股骨＋脛骨。</p>
+                    <p><span class="tag">上下一致型</span> 骨盆/大小腿旋轉一致但足功能差（扁平足）→ 需極大足部強度征服上方。</p>
+                    <p><span class="tag">上下分離型</span> 力線斷裂，需先處理矛盾點。</p>
+                    <p><span class="tag">結構性長短腿</span> 若代償方向相反，可能存在結構問題或人為干預（非真實狀態）。</p>
+                </div>
+            </div>
+
+            <div class="step-timeline">
+                <div class="step-item">
+                    <div class="step-title">測試四：跟骨與坐骨連動</div>
+                    <div class="logic-badge">LOGIC</div>
+                    <p>理想站姿：坐骨應落在跟骨正上方。若父母關係不和（力線中斷），孩子就會亂站隊形成異常腿型。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二部分：骨盆基礎 -->
+        <section id="pelvis" class="section-offset">
+            <h2>🧩 第二部分：骨盆基礎——精準評估與系統調整</h2>
+            <div class="card-grid">
+                <div class="card"><h4>📏 骨盆側傾（高低）</h4> 兩支筆水平置於髂前上棘，肉眼觀察頂端是否水平。反覆3-5次。</div>
+                <div class="card"><h4>↔️ 前/後傾評估</h4> 恥骨聯合與髂前上棘垂直筆比較：ASIS更靠前＝前傾；恥骨聯合更靠前＝後傾。</div>
+                <div class="card"><h4>⚖️ 力偶關係</h4> 前傾：豎脊肌＋髖屈肌緊張；腹直肌＋膕繩肌薄弱。後傾則相反。</div>
+            </div>
+
+            <h3>📌 骨盆前傾系統調整 (放鬆→呼吸→強化)</h3>
+            <div class="step-timeline">
+                <div class="step-item"><span class="step-title">放鬆豎脊肌 (嬰兒式變體)</span> 跪坐，雙手爬行，臀部不離腳跟，保持1-2分鐘。</div>
+                <div class="step-item"><span class="step-title">放鬆股四頭肌</span> 弓步/側臥位拉伸，收腹做骨盆後傾加強感受。30s-1min/側，2-4組。</div>
+                <div class="step-item"><span class="step-title">腹式呼吸激活 (四階段)</span> 仰臥(360°鼓起)→仰臥抗阻→俯臥(向後背擴張)→四足支撐(呼氣收緊如束腰)。</div>
+                <div class="step-item"><span class="step-title">強化膕繩肌 (臀橋)</span> 勾腳尖，優先啟動大腿後側，髖、膝、肩呈線。15-20次/組，2-4組。</div>
+            </div>
+            <p class="quote-block" style="margin-top: 1rem;">✅ 最終驗證：再次筆測，前後一致即可進入下一階段。</p>
+        </section>
+
+        <!-- 第三部分：膝關節與髖關節 -->
+        <section id="hip-knee" class="section-offset">
+            <h2>🦵 第三部分：膝關節與髖關節——精準功能評估</h2>
+            <div class="card-grid">
+                <div class="card"><h4>🦵 脛骨內/外旋 (屈膝位)</h4> 坐姿屈膝90°，相差＜5°合格。內旋不足＝內旋肌緊張；外旋不足＝外旋肌功能受限。</div>
+                <div class="card"><h4>🦴 股骨內/外旋 (俯臥位)</h4> 俯臥屈膝90°，小腿向外倒＝股骨內旋 (TFL緊張)；向內倒＝股骨外旋 (臀中/大肌緊張)。</div>
+            </div>
+            <h3>“假胯寬”精準改善</h3>
+            <div class="step-timeline">
+                <div class="step-item"><span class="step-title">股骨內旋 (TFL緊張)</span> 側臥位筋膜球放鬆三角區前側；強化臀中肌(坐姿彈力帶外旋)。</div>
+                <div class="step-item"><span class="step-title">股骨外旋 (臀肌緊張)</span> 放鬆三角區後側；強化TFL(坐姿彈力帶內旋)。</div>
+                <div class="step-item"><span class="step-title">最終驗證</span> 俯臥位小腿角度趨於對稱。</div>
+            </div>
+        </section>
+
+        <!-- 第四部分：足踝根基 -->
+        <section id="foot" class="section-offset">
+            <h2>🦶 第四部分：足踝根基——精準評估與系統調整</h2>
+            <div class="card-grid">
+                <div class="card"><h4>骨性結構評估</h4> 跟骨外翻(「(」形)→足弓塌；內翻(「)」形)→高足弓。距骨錯位限制背屈；舟骨被踩出→足弓塌陷，禁忌大重量深蹲。</div>
+                <div class="card"><h4>足內翻/外翻測試</h4> 內翻25-35°，外翻15-25°。內翻不足→高足弓傾向(脛骨前肌緊)；外翻不足→扁平足傾向(腓骨長短肌緊)。</div>
+            </div>
+            <h3>針對性改善（放鬆→強化）</h3>
+            <div class="step-item">
+                <div class="step-title">高足弓傾向 (內翻不足)</div> 
+                <p>🔹放鬆脛骨前肌 (筋膜球按壓+足踝屈伸) 直至痛點↓50%。<br>🔹強化腓骨長短肌 (彈力帶套足外側，做蹠屈+外翻)。</p>
+            </div>
+            <div class="step-item">
+                <div class="step-title">扁平足傾向 (外翻不足)</div> 
+                <p>🔹放鬆腓骨長短肌 (按壓+足背屈伸)。<br>🔹強化脛骨前肌 (彈力帶套足內側，做背屈+內翻)。<br>🔹進階強化：脛骨後肌（站立位足弓上頂，10-15秒/次）。</p>
+            </div>
+            <h4>足踝關鍵鬆動手法治療 (專業操作)</h4>
+            <p>跟骨外/內翻矯正、舟骨復位(內→外/下→上)、距骨鬆動(俯臥屈膝虎口卡距骨向前推)。</p>
+        </section>
+
+        <!-- 第五部分：整合訓練——腿型專項 -->
+        <section id="training" class="section-offset">
+            <h2>🏋️ 第五部分：腿型專項整合訓練</h2>
+            <p class="highlight-bg">⚠️ 必須建立在關節正位與肌肉平衡之後</p>
+            <div class="card-grid">
+                <div class="card"><h4>O型腿</h4> 強化內收肌：仰臥激活→側臥位離心(可後伸10-15°)→站立位彈力帶內收對抗。</div>
+                <div class="card"><h4>X型腿</h4> 強化屈髖肌與臀肌：三方向蚌式＋髂腰肌腹斜肌整合(仰臥踢毽子對側卷腹)。</div>
+                <div class="card"><h4>XO型腿</h4> 強化臀中肌控制外旋：站立/側臥，髖外展35°下做股骨外旋，感受臀中肌頂峰收縮。</div>
+            </div>
+        </section>
+
+        <!-- 第六部分：從物理到化學 + 專家叮囑 -->
+        <section id="holistic" class="section-offset">
+            <h2>🌐 第六部分：宏觀視角——足踝影響全身健康</h2>
+            <div class="quote-block">
+                <p>⚡ 數據：一隻腳26塊骨頭 (佔全身1/4)、100多條肌肉、200多條韌帶。站立時足踝提供70%穩定性，承載100%體重。</p>
+            </div>
+            <h3>新加坡媽媽案例 (物理改變化學)</h3>
+            <p><span class="tag">產後14年</span> 長期怕冷、大便稀溏，中藥無效。根源：足踝功能差→力線無法上傳→橫膈膜受壓→腦幹功能抑制。經2週足踝訓練(脛骨後肌、腓骨長肌)後，可開冷氣、食生冷水果、大便成形。</p>
+            <div class="quote-block" style="border-left-color: var(--accent-teal);">
+                <p>「物理的東西會造成化學的反應。這是物理的問題，你用化學的方式只能緩解，不能根治。」</p>
+            </div>
+
+            <h4>重新定義「氣」</h4>
+            <p><span class="tag">中氣</span>＝骨盆底肌；<span class="tag">下氣</span>＝大腿小腿(橋樑)；<span class="tag">地氣</span>＝腳(接地氣)。真氣自下而上；假氣由上而下，只練腹肌肋間，導致內臟壓力。</p>
+            <p><strong>選鞋最簡單指標：</strong> 測安靜心率 → 穿鞋同速走一圈 → 立刻測心率，心率升高幅度最小者最適合你。</p>
+
+            <hr style="margin: 2.5rem 0; border-color: var(--border-light);">
+
+            <h2>📌 專家終極叮囑</h2>
+            <div class="card-grid">
+                <div class="card"><h4>⚠️ 不被表象迷惑</h4> 肉眼所見多為代償結果，必須透過「父母-孩子」評估找出力學根源。</div>
+                <div class="card"><h4>🚫 不滿足於症狀緩解</h4> 止痛、麻痺、代償都不是根本，正向根源解法才是職責。</div>
+                <div class="card"><h4>🧠 學習心態</h4> 動作不值錢，值錢的是動作背後的力學、神經、呼吸、內臟互動。需要多年臨床實踐才能融會貫通。</div>
+            </div>
+            <div class="quote-block" style="margin-top: 2rem;">
+                <p>「即使你是太陽，也要收斂光芒，給螢火蟲機會。這叫和光同塵。你剛知道這一點皮毛，就急著去點別人，會出問題的。」</p>
+                <p class="quote-author">—— 苗振</p>
+            </div>
+        </section>
+
+        <!-- 簡短 footer -->
+        <div class="footer-note">
+            ⚕️ 下肢生物力學 SOP · 苗振體系完整還原<br>
+            保留所有解剖術語、角度、邏輯步驟 · 非損壓縮版
+        </div>
+    </main>
+</body>
+</html>
