@@ -2,577 +2,344 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Gavin Chan 神經力學筆記 | 科技樁與步態重建 · 學員專屬</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gavin Chan 神經力學筆記 | 科技樁與步態重建</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0A0F1E;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             color: #E9F1FC;
             line-height: 1.5;
             padding: 2rem 1rem;
         }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1280px; margin: 0 auto; }
         :root {
             --primary: #2B6EF0;
-            --primary-glow: #1E4FCF;
             --accent: #00D4FF;
             --bg-card: #11161F;
             --border-dim: #232A36;
             --text-muted: #8A99B4;
         }
-
         h1 {
-            font-size: 2.1rem;
-            font-weight: 600;
+            font-size: 2rem;
             background: linear-gradient(135deg, #FFFFFF, var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: -0.3px;
-            margin-bottom: 0.3rem;
         }
-
         h2 {
-            font-size: 1.5rem;
-            font-weight: 500;
+            font-size: 1.4rem;
             border-left: 4px solid var(--primary);
             padding-left: 1rem;
-            margin: 2rem 0 1rem 0;
+            margin: 1.5rem 0 1rem 0;
         }
-
         h3 {
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin: 1rem 0 0.5rem 0;
+            font-size: 1.1rem;
             color: var(--accent);
+            margin-bottom: 0.5rem;
         }
-
-        .subhead {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-dim);
-            padding-bottom: 1rem;
-        }
-
         .card {
             background: var(--bg-card);
             border-radius: 28px;
             border: 1px solid var(--border-dim);
             padding: 1.5rem;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(2px);
-            transition: all 0.2s ease;
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
+            margin-bottom: 1.5rem;
         }
-
         .grid-2 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.8rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
-
-        .data-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .data-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-dim);
-            padding: 0.6rem 0;
-        }
-
-        .data-label {
-            font-weight: 500;
-            width: 160px;
-        }
-
-        .data-input {
-            background: #1E2533;
-            border: 1px solid var(--border-dim);
-            border-radius: 40px;
-            padding: 0.4rem 0.8rem;
-            color: white;
-            width: 120px;
-            text-align: center;
-        }
-
         .badge {
-            background: var(--primary-glow);
+            background: #1E4FCF;
             border-radius: 40px;
             padding: 0.2rem 0.8rem;
-            font-size: 0.75rem;
-            font-weight: 500;
+            font-size: 0.7rem;
             display: inline-block;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 1rem 0;
         }
-
         th, td {
             border: 1px solid var(--border-dim);
-            padding: 12px 8px;
+            padding: 10px;
             text-align: left;
-            vertical-align: top;
         }
-
-        th {
-            background: #0F172A;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
+        th { background: #0F172A; color: var(--accent); }
         .quiz-item {
             background: #0C111C;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 1rem;
             margin-bottom: 1rem;
         }
-
-        .quiz-question {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-            margin: 0.5rem 0;
-        }
-
         button {
             background: var(--primary);
             border: none;
             color: white;
-            padding: 0.6rem 1.5rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 40px;
-            font-weight: 500;
             cursor: pointer;
-            transition: 0.2s;
-            margin-top: 0.5rem;
         }
-
-        button:hover {
-            background: #004ecc;
-            transform: scale(0.98);
-        }
-
         .result-area {
             background: #071126;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 1rem;
             margin-top: 1rem;
-            font-size: 0.9rem;
             border-left: 3px solid var(--accent);
         }
-
-        .footer-note {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-dim);
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
         .insight {
             background: rgba(43,110,240,0.1);
             border-left: 3px solid var(--primary);
-            padding: 0.8rem;
-            margin: 0.8rem 0;
-            border-radius: 12px;
+            padding: 0.6rem;
+            margin: 0.5rem 0;
+            border-radius: 10px;
         }
-
-        /* 封鎖頁面樣式 */
-        .lock-screen {
+        .footer-note {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border-dim);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        /* 密碼輸入頁面 */
+        .password-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: #03060E;
-            z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            backdrop-filter: blur(12px);
+            z-index: 2000;
         }
-        .lock-card {
-            background: #0F1422;
+        .password-card {
+            background: #11161F;
             border-radius: 48px;
-            padding: 2rem;
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 90%;
             text-align: center;
-            max-width: 480px;
-            border: 1px solid #FF4D4D;
-            box-shadow: 0 0 30px rgba(255,50,50,0.2);
+            border: 1px solid var(--primary);
         }
-        .lock-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+        .password-input {
+            background: #1E2533;
+            border: 1px solid var(--border-dim);
+            border-radius: 60px;
+            padding: 1rem;
+            width: 100%;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-align: center;
+            color: white;
+            font-family: monospace;
+            margin: 1.5rem 0;
         }
-        .lock-title {
-            font-size: 1.8rem;
-            font-weight: 700;
+        .error-msg {
             color: #FF7A5C;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
         }
-        .lock-sub {
-            color: #B0BBD5;
-            margin: 1rem 0;
+        .hidden { display: none; }
+        .data-input {
+            background: #1E2533;
+            border: 1px solid var(--border-dim);
+            border-radius: 40px;
+            padding: 0.3rem 0.8rem;
+            color: white;
         }
-        .hidden {
-            display: none;
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-dim);
         }
     </style>
 </head>
 <body>
-<div id="lockOverlay" class="lock-screen hidden">
-    <div class="lock-card">
-        <div class="lock-icon">🔒⛔</div>
-        <div class="lock-title">一次性密碼已失效</div>
-        <div class="lock-sub">此密碼已被其他裝置啟用或超過授權次數。<br>根據 Gavin 神經力學協議，每個密碼僅限單一裝置使用。<br>請重新獲取新的密碼。</div>
-        <button id="backToGenerator" style="background:#3A2C2C; margin-top:1rem;">返回密碼生成器</button>
+
+<!-- 密碼輸入頁面 -->
+<div id="passwordScreen" class="password-screen">
+    <div class="password-card">
+        <h1>🔐 Gavin 神經力學筆記</h1>
+        <p style="color: #8A99B4; margin: 0.5rem 0;">科技樁 × 步態重建</p>
+        <p style="font-size: 0.85rem; margin: 1rem 0;">請輸入您的專屬一次性密碼</p>
+        <input type="text" id="passwordInput" class="password-input" placeholder="輸入 12 碼密碼" maxlength="12" autocomplete="off">
+        <div id="passwordError" class="error-msg"></div>
+        <button id="unlockBtn" style="margin-top: 1rem;">🔓 解鎖筆記</button>
+        <p style="font-size: 0.7rem; color: #5A6A8A; margin-top: 1.5rem;">每個密碼僅限單一裝置使用</p>
     </div>
 </div>
 
+<!-- 主要筆記內容 (初始隱藏) -->
 <div id="mainContent" class="container hidden">
     <h1>🧠 神經力學筆記 · 移動的呼吸</h1>
-    <div class="subhead">科技樁 × 步態重建 | 講師：Gavin Chan 代謝修復專家 | 學員專屬 · 一次性授權</div>
+    <div class="subhead" style="color: var(--text-muted); margin-bottom: 1.5rem;">科技樁 × 步態重建 | 講師：Gavin Chan 代謝修復專家</div>
 
-    <!-- 1. 個人神經力學數據區 -->
+    <!-- 數據區 -->
     <div class="card">
         <h2>📊 你的神經力學數據檔案</h2>
-        <div class="data-form" id="neuroDataForm">
-            <div class="data-row"><span class="data-label">靜態心率 (站前)</span><input type="number" id="hrBefore" class="data-input" placeholder="bpm"></div>
-            <div class="data-row"><span class="data-label">靜態心率 (站樁後)</span><input type="number" id="hrAfter" class="data-input" placeholder="bpm"></div>
-            <div class="data-row"><span class="data-label">血氧飽和度 (%)</span><input type="number" id="spo2" class="data-input" placeholder="96-99"></div>
-            <div class="data-row"><span class="data-label">身體重心偏向</span>
-                <select id="重心" class="data-input" style="width:140px">
-                    <option>左側承重</option><option>右側承重</option><option>居中</option>
-                </select>
-            </div>
-            <div class="data-row"><span class="data-label">支撐策略 (站姿微晃)</span>
-                <select id="strategy" class="data-input">
-                    <option>踝策略</option><option>髖策略</option><option>邁步策略</option>
-                </select>
-            </div>
-            <button id="saveNeuroBtn">📌 儲存當下數據</button>
-            <div id="neuroResult" class="result-area">👉 儲存後將分析：心率差反映「煞車效能」，血氧低於95%代表死氣積累。</div>
-        </div>
+        <div class="data-row"><span>靜態心率 (站前)</span><input type="number" id="hrBefore" class="data-input" style="width:100px;"></div>
+        <div class="data-row"><span>靜態心率 (站樁後)</span><input type="number" id="hrAfter" class="data-input" style="width:100px;"></div>
+        <div class="data-row"><span>血氧飽和度 (%)</span><input type="number" id="spo2" class="data-input" style="width:100px;"></div>
+        <div class="data-row"><span>身體重心偏向</span><select id="重心" class="data-input"><option>左側承重</option><option>右側承重</option><option>居中</option></select></div>
+        <div class="data-row"><span>支撐策略</span><select id="strategy" class="data-input"><option>踝策略</option><option>髖策略</option><option>邁步策略</option></select></div>
+        <button id="saveNeuroBtn" style="margin-top:1rem;">📌 儲存分析</button>
+        <div id="neuroResult" class="result-area"></div>
     </div>
 
-    <!-- 2. 真假 X型腿/代償 鑑別清單 -->
+    <!-- 真假X型腿對比 -->
     <div class="card">
         <h2>🔍 真假X型腿／代償鑑別清單</h2>
         <table>
-            <thead><tr><th>結構性異常 (教科書版)</th><th>神經性假代償 (Gavin 版)</th></tr></thead>
-            <tbody>
-                <tr><td>骨骼角度異常 >15° 股骨內旋</td><td>⚠️ 力學鏈條崩潰：踝策略失靈 → 髖鎖死 → 膝被迫內扣</td></tr>
-                <tr><td>膝外翻/內翻基因遺傳</td><td>🧬 神經性代償：大腦為了「不跌倒」強迫膝關節扭轉，並非骨頭變形</td></tr>
-                <tr><td>專注矯形鞋墊、切骨手術</td><td>⚡ 優先解鎖足弓升降 + 髖內旋，膝蓋自然回正，「肇事者」在腳底</td></tr>
-                <tr><td>扁平足 = 足弓塌陷</td><td>🦶 功能性高足弓：脛骨外旋卡死，視覺扁平，實則高弓→ 練錯更糟</td></tr>
-            </tbody>
+            <tr><th>結構性異常 (教科書版)</th><th>神經性假代償 (Gavin 版)</th></tr>
+            <tr><td>骨骼角度異常 >15° 股骨內旋</td><td>⚠️ 力學鏈條崩潰：踝策略失靈 → 髖鎖死 → 膝被迫內扣</td></tr>
+            <tr><td>膝外翻/內翻基因遺傳</td><td>🧬 神經性代償：大腦為了「不跌倒」強迫膝關節扭轉</td></tr>
+            <tr><td>專注矯形鞋墊、切骨手術</td><td>⚡ 優先解鎖足弓升降 + 髖內旋，膝蓋自然回正</td></tr>
+            <tr><td>扁平足 = 足弓塌陷</td><td>🦶 功能性高足弓：脛骨外旋卡死，視覺扁平實則高弓</td></tr>
         </table>
-        <div class="insight">💡 Gavin 提醒：不要被「形狀」騙了，大腦選擇最省力的歪斜，不是骨頭壞掉，是力學斷線。</div>
+        <div class="insight">💡 Gavin 提醒：不要被「形狀」騙了，大腦選擇最省力的歪斜，不是骨頭壞掉。</div>
     </div>
 
-    <!-- 3. 核心知識點濃縮 -->
+    <!-- 核心知識 -->
     <div class="grid-2">
-        <div class="card">
-            <h3>👣 站立位代償三部曲</h3>
-            <p>1️⃣ 腳底失能 → 踝策略失效 → 腳後跟「煞車」不靈。<br>
-            2️⃣ 大腦強制啟動髖策略 → 屁股夾緊，骶骨鎖死 → 骨盆底肌失能。<br>
-            3️⃣ 膝蓋成為受害者 → 半月板、韌帶承受扭轉剪力 → 疼痛警報響起。<br>
-            <span class="badge">膝蓋是受害者，腳底是肇事者</span></p>
-        </div>
-        <div class="card">
-            <h3>🧘 科技樁四大金律</h3>
-            <p>✅ 腳跟踩實 —— 重啟「煞車」，讓心率降下來。<br>
-            ✅ 屁股放鬆 —— 抑制髖策略，恢復骨盆底肌律動。<br>
-            ✅ 肋骨找恥骨 —— 關閉肋骨外翻，啟動腹式呼氣。<br>
-            ✅ 呼吸氣徹腳底 —— 意念引導，讓氣流動，死氣變活氣。</p>
-        </div>
-        <div class="card">
-            <h3>⚙️ 策略分級 (站/走)</h3>
-            <p>🔹 踝策略：日常站立、輕微晃動，只動腳踝，省力穩定。<br>
-            🔸 髖策略：身體超出腳的投影面積50%時啟動，臀肌輔助平衡。<br>
-            🔹 邁步策略：最後防線。若你站著不動就夾臀，代表踝策略崩潰，超前使用髖策略 → 慢性破壞。</p>
-        </div>
+        <div class="card"><h3>👣 站立位代償三部曲</h3><p>1️⃣ 腳底失能 → 踝策略失效<br>2️⃣ 大腦強制啟動髖策略 → 屁股夾緊，骶骨鎖死<br>3️⃣ 膝蓋成為受害者 → 疼痛警報響起<br><span class="badge">膝蓋是受害者，腳底是肇事者</span></p></div>
+        <div class="card"><h3>🧘 科技樁四大金律</h3><p>✅ 腳跟踩實 — 重啟煞車<br>✅ 屁股放鬆 — 抑制髖策略<br>✅ 肋骨找恥骨 — 啟動呼氣<br>✅ 呼吸氣徹腳底 — 死氣變活氣</p></div>
+        <div class="card"><h3>⚙️ 策略分級</h3><p>🔹 踝策略：日常站立、輕微晃動<br>🔸 髖策略：超出投影面積50%時啟動<br>🔹 邁步策略：最後防線，過早啟用代表踝策略崩潰</p></div>
     </div>
 
-    <!-- 4. 10題神經偵探自我檢測 -->
+    <!-- 老祖宗智慧 -->
     <div class="card">
-        <h2>🕵️ 神經偵探自我檢測</h2>
-        <div id="quizContainer"></div>
-        <button id="submitQuiz">🔎 提交答案 & 看 Gavin 解析</button>
-        <div id="quizResult" class="result-area"></div>
-    </div>
-
-    <!-- 5. 老祖宗智慧專區 -->
-    <div class="card">
-        <h2>🏮 老祖宗智慧專區 · 成語神經力學</h2>
+        <h2>🏮 老祖宗智慧 · 成語神經力學</h2>
         <div class="grid-2">
-            <div><span class="badge">虛靈頂勁</span> — 頭頸虛懸，激活迷走神經，讓交感剎車；站樁時頸部一圈「虛」，才能氣血流暢。</div>
-            <div><span class="badge">落地生根</span> — 腳跟壓地，啟動踝策略，把重心「種」下去，身體才會穩如泰山。</div>
-            <div><span class="badge">反求諸己</span> — 膝痛腰酸時，不怨關節，往腳底找答案。神經系統代償，根源在腳。</div>
-            <div><span class="badge">以靜制動</span> — 科技樁用靜止狀態，抑制交感過激，讓身體自己修復，而非蠻力訓練。</div>
+            <div><span class="badge">虛靈頂勁</span> — 頭頸虛懸，激活迷走神經</div>
+            <div><span class="badge">落地生根</span> — 腳跟壓地，啟動踝策略</div>
+            <div><span class="badge">反求諸己</span> — 膝痛腰酸，往腳底找答案</div>
+            <div><span class="badge">以靜制動</span> — 科技樁抑制交感過激</div>
         </div>
-        <div class="insight">✨ Gavin 解讀：成語是千年的神經編程，看懂的人，用站樁就能調呼吸、正骨架。</div>
     </div>
 
-    <!-- 6. 下堂課預告 -->
     <div class="card">
         <h2>🔮 下堂課預告：破解身體的「偏見」</h2>
-        <p><strong>順代償 vs 逆代償</strong> — 左側骨盆旋前、右側骨盆旋後，是真長短腿還是神經「偏見」？如何用科技樁修正高低肩、長短腿，讓左右腦平衡。</p>
-        <p>🔥 你將學會：從步態讀懂身體的偏心，把「順代償」扭轉成穩定中軸。</p>
-        <div style="background: #0F172F; border-radius: 20px; padding: 1rem; margin: 1rem 0; text-align: center;">
-            🧬 這類代謝修復問題往往需要個性化評估，從神經力學重建步態，而非頭痛醫頭。<br>
-            📩 歡迎私訊「諮詢」獲取 Gavin 一對一策略。
+        <p><strong>順代償 vs 逆代償</strong> — 左側骨盆旋前、右側骨盆旋後，是真長短腿還是神經偏見？</p>
+        <div style="background:#0F172F; border-radius:20px; padding:1rem; text-align:center; margin-top:1rem;">
+            🧬 這類代謝修復問題往往需要個性化評估<br>
+            📩 歡迎私訊「諮詢」獲取 Gavin 一對一策略
         </div>
     </div>
-    <div class="footer-note">
-        © Gavin Chan 神經力學 · 數據說話 · 科技樁 ｜ 無評估，不康復。學會看步態，你就是自己的偵探。
-    </div>
+    <div class="footer-note">© Gavin Chan 神經力學 · 數據說話 · 科技樁 ｜ 無評估，不康復</div>
 </div>
 
 <script>
-    // ------------------- 一次性密碼 + 裝置指紋封鎖邏輯 -------------------
-    const STORAGE_KEY_PREFIX = "GavinNeuro_";
-    let currentValidCode = null;
-
-    // 生成簡單裝置指紋 (基於用戶代理 + 屏幕解析度 + 時區 + 語言，足夠唯一性)
-    function getDeviceFingerprint() {
-        const nav = navigator;
-        let fingerprint = [
-            nav.userAgent,
-            screen.width + "x" + screen.height + "x" + screen.colorDepth,
-            new Date().getTimezoneOffset(),
-            nav.language || nav.userLanguage,
-            nav.hardwareConcurrency || "unknown"
-        ].join("|");
-        // 簡單hash (非加密但用於比對)
-        let hash = 0;
-        for (let i = 0; i < fingerprint.length; i++) {
-            hash = ((hash << 5) - hash) + fingerprint.charCodeAt(i);
-            hash |= 0;
+    // ---------- 密碼驗證邏輯 ----------
+    // 此處直接與 localStorage 中的密碼清單連動（由講師密碼生成器管理）
+    // 密碼清單儲存在 localStorage 的 "Gavin_Passwords_List" 中
+    
+    function getStoredPasswords() {
+        const stored = localStorage.getItem("Gavin_Passwords_List");
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch(e) {
+                return [];
+            }
         }
-        return Math.abs(hash).toString(36);
+        return [];
     }
-
-    // 驗證一次性密碼（URL參數傳入 code, ts）
-    function validateOneTimePassword() {
-        const urlParams = new URLSearchParams(window.location.search);
-        let encodedCode = urlParams.get('code');
-        const timestamp = urlParams.get('ts');
-        if (!encodedCode) {
-            showLockScreen("無效存取：未提供密碼憑證");
-            return false;
+    
+    function validateAndUsePassword(code) {
+        const passwords = getStoredPasswords();
+        const idx = passwords.findIndex(p => p.code === code);
+        if (idx === -1) {
+            return { valid: false, message: "❌ 密碼無效，請確認後重新輸入" };
         }
-        try {
-            currentValidCode = atob(decodeURIComponent(encodedCode));
-        } catch(e) {
-            showLockScreen("密碼格式錯誤");
-            return false;
+        if (passwords[idx].status === "used") {
+            return { valid: false, message: "🔒 此密碼已被使用過，每個密碼僅限一人使用" };
         }
-        if (!currentValidCode || currentValidCode.length < 8) {
-            showLockScreen("一次性密碼無效");
-            return false;
+        if (passwords[idx].status === "active") {
+            // 標記為已使用
+            passwords[idx].status = "used";
+            localStorage.setItem("Gavin_Passwords_List", JSON.stringify(passwords));
+            // 同時記錄此裝置已解鎖
+            localStorage.setItem("Gavin_Unlocked_Device", code);
+            return { valid: true, message: "驗證成功" };
         }
-
-        const deviceId = getDeviceFingerprint();
-        const storedKey = STORAGE_KEY_PREFIX + currentValidCode;
-        const storedDataRaw = localStorage.getItem(storedKey);
-
-        // 無記錄 -> 首次啟用，儲存裝置指紋 + 時間戳
-        if (!storedDataRaw) {
-            const record = {
-                device: deviceId,
-                firstAccess: timestamp || Date.now(),
-                used: true
-            };
-            localStorage.setItem(storedKey, JSON.stringify(record));
+        return { valid: false, message: "密碼狀態異常" };
+    }
+    
+    function checkAlreadyUnlocked() {
+        const unlockedCode = localStorage.getItem("Gavin_Unlocked_Device");
+        if (!unlockedCode) return false;
+        // 驗證這個密碼是否仍然有效（未被其他裝置使用）
+        const passwords = getStoredPasswords();
+        const found = passwords.find(p => p.code === unlockedCode);
+        // 如果密碼存在且狀態為 used，表示此裝置之前已解鎖過，允許進入
+        if (found && found.status === "used") {
             return true;
         }
-
-        // 已有記錄 -> 比對裝置指紋
-        try {
-            const record = JSON.parse(storedDataRaw);
-            if (record.device === deviceId) {
-                // 同裝置再次刷新頁面允許 (合理範圍)
-                return true;
-            } else {
-                // 不同裝置嘗試使用同一密碼 -> 永久封鎖該密碼，並顯示警告
-                // 同時清除本地記錄避免繞過 (直接鎖)
-                showLockScreen(`⚠️ 一次性密碼 ${currentValidCode} 已被其他裝置使用。\n根據神經力學協議，密碼失效且帳戶已封鎖。請重新取得新密碼。`);
-                // 清除該密碼記錄，讓後續連線也無法再使用 (標記為blocked)
-                localStorage.setItem(storedKey + "_blocked", "true");
-                return false;
-            }
-        } catch (err) {
-            showLockScreen("驗證失敗，請重新產生密碼");
-            return false;
+        // 如果密碼被刪除或狀態異常，清除記錄
+        localStorage.removeItem("Gavin_Unlocked_Device");
+        return false;
+    }
+    
+    function unlockNotes(password) {
+        const result = validateAndUsePassword(password.trim().toUpperCase());
+        if (result.valid) {
+            document.getElementById('passwordScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+        } else {
+            document.getElementById('passwordError').innerText = result.message;
         }
     }
-
-    function showLockScreen(message) {
-        const lockDiv = document.getElementById('lockOverlay');
-        const mainDiv = document.getElementById('mainContent');
-        if (lockDiv) {
-            lockDiv.classList.remove('hidden');
-            const subElem = lockDiv.querySelector('.lock-sub');
-            if (subElem) subElem.innerHTML = message + "<br><br>請返回密碼生成器，產生新的一次性密碼。";
-        }
-        if (mainDiv) mainDiv.classList.add('hidden');
-    }
-
-    // 返回生成器按鈕
-    function bindBackButton() {
-        const backBtn = document.getElementById('backToGenerator');
-        if (backBtn) {
-            backBtn.addEventListener('click', () => {
-                window.location.href = "gavin_password_generator.html";
-            });
-        }
-    }
-
-    // ------------------- 原本筆記的所有互動功能 (保留完整) -------------------
-    const quizData = [
-        { q: "1. 刷牙洗臉時腰酸，問題主要出在？", options: ["腰椎間盤突出", "髖關節夾擠", "踝策略失效，骨盆代償"], correct: 2, explanation: "Gavin 解析：踝策略失效，身體前傾時腳後跟煞不住，腰背肌肉被迫夾緊代償，跟腰椎無關！" },
-        { q: "2. 站樁時心率反而上升，代表？", options: ["站得不夠久", "交感持續亢奮，髖策略主導", "有效練到心肺"], correct: 1, explanation: "錯！站樁心率不降反升，代表你仍卡在「推進位」，用肌肉死撐，根本沒啟動副交感。" },
-        { q: "3. 關於「膝蓋是受害者」以下何者正確？", options: ["膝蓋天生脆弱", "腳底力線斷裂→膝被迫扭轉", "需要多練股四頭肌保護"], correct: 1, explanation: "膝蓋沒有自主權，腳底失衡（踝策略失靈）讓膝關節承受剪切力，練再多腿也無解。" },
-        { q: "4. 功能性扁平足的人，足弓為什麼看起來扁？", options: ["脛骨外旋卡死，內側被迫壓扁", "先天韌帶鬆弛", "走路太多"], correct: 0, explanation: "Gavin 版：小腿卡在外旋位，大腦用膝內扣壓扁足弓來減震，視覺扁平但功能是高足弓！" },
-        { q: "5. 「科技樁」四大金律中，哪一項最優先？", options: ["肋骨找恥骨", "屁股夾緊穩定", "腳跟踩實"], correct: 2, explanation: "腳跟踩實＝重建煞車，沒有煞車後面全部是假動作。心率降不下來，先練腳後跟。" },
-        { q: "6. 走路時骨盆過度左右搖晃，通常是？", options: ["髖關節外展肌群無力", "脊椎旋轉不足+髖策略失衡", "膝關節太鬆"], correct: 1, explanation: "傳動軸卡住，引擎（髖）只能用外展代償，搖晃幅度越大，神經耗能越高。" },
-        { q: "7. 為什麼練臀大肌太多反而容易漏尿、痔瘡？", options: ["臀大肌壓迫直腸", "臀大肌下束鎖死骶骨，抑制骨盆底肌上升", "體重變重"], correct: 1, explanation: "臀大肌下束→骶骨鎖死→骨盆底肌失去上升能力，內臟下沉。強臀不如先通踝。" },
-        { q: "8. 下列哪個是「邁步策略」過早啟用的警訊？", options: ["走路常絆倒", "站著不動時身體會自動想跨步", "膝蓋外側痛"], correct: 1, explanation: "踝+髖策略全崩，大腦只能靠前後跨步維持不摔，代表神經力學瀕臨失衡。" },
-        { q: "9. 哪一項是「神經性假代償」的特徵？", options: ["X光骨頭明顯歪斜", "閉眼單腳站不穩但外觀無異常", "矯正後馬上復發，但步態改變立即改善"], correct: 2, explanation: "骨頭沒壞，是大腦選了錯誤的力學路徑。調整步態，力線順了，歪斜自然消失。" },
-        { q: "10. 站樁時「肋骨找恥骨」主要作用？", options: ["練腹肌", "關閉肋骨外翻，啟動腹式呼氣，讓橫膈膜上升", "避免駝背"], correct: 1, explanation: "肋骨關閉才能讓橫膈膜有空間回彈，這是氣沉丹田的核心機械動作。" }
-    ];
-
-    function buildQuiz() {
-        const container = document.getElementById('quizContainer');
-        if (!container) return;
-        container.innerHTML = '';
-        quizData.forEach((item, idx) => {
-            const div = document.createElement('div');
-            div.classList.add('quiz-item');
-            div.setAttribute('data-qidx', idx);
-            div.innerHTML = `
-                <div class="quiz-question">${item.q}</div>
-                <div class="quiz-options" id="quiz-${idx}">
-                    ${item.options.map((opt, optIdx) => `
-                        <label style="display:flex; gap:8px; align-items:center;">
-                            <input type="radio" name="q${idx}" value="${optIdx}"> ${opt}
-                        </label>
-                    `).join('')}
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function computeScore() {
-        let score = 0;
-        let explanations = [];
-        for (let i = 0; i < quizData.length; i++) {
-            const selected = document.querySelector(`input[name="q${i}"]:checked`);
-            if (selected) {
-                const userVal = parseInt(selected.value);
-                if (userVal === quizData[i].correct) {
-                    score++;
-                    explanations.push(`✅ 第${i+1}題正確：${quizData[i].explanation}`);
-                } else {
-                    explanations.push(`❌ 第${i+1}題錯誤。${quizData[i].explanation}`);
-                }
-            } else {
-                explanations.push(`⚠️ 第${i+1}題未作答 — 漏掉關鍵線索：${quizData[i].explanation.substring(0, 80)}...`);
-            }
-        }
-        return { score, explanations };
-    }
-
-    function bindQuizEvents() {
-        const submitBtn = document.getElementById('submitQuiz');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', () => {
-                const { score, explanations } = computeScore();
-                const total = quizData.length;
-                let gradeMsg = '';
-                if (score >= 8) gradeMsg = '🧠 神經偵探大師級！你已經能用 Gavin 視角看身體。';
-                else if (score >= 5) gradeMsg = '🕵️‍♂️ 具備偵探潛力，再多觀察「踝策略」與代償鏈。';
-                else gradeMsg = '📡 神經力學尚待校準，回頭複習「腳跟煞車」與「真假X型腿」章節。';
-                const resultHtml = `<strong>得分：${score} / ${total}</strong><br>${gradeMsg}<br><br>` + 
-                    explanations.map(e => `<div class="insight" style="margin-top:6px;">${e}</div>`).join('');
-                document.getElementById('quizResult').innerHTML = resultHtml;
-            });
-        }
-    }
-
-    function bindDataSave() {
-        const saveBtn = document.getElementById('saveNeuroBtn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
-                const hrBefore = parseInt(document.getElementById('hrBefore').value) || 0;
-                const hrAfter = parseInt(document.getElementById('hrAfter').value) || 0;
-                const spo2 = parseInt(document.getElementById('spo2').value) || 0;
-                const重心 = document.getElementById('重心').value;
-                const strategy = document.getElementById('strategy').value;
-
-                let analysis = '';
-                if (hrBefore > 0 && hrAfter > 0) {
-                    const diff = hrAfter - hrBefore;
-                    if (diff > 3) analysis += `⚠️ 站樁後心率上升 ${diff} bpm，代表「髖策略主導」，腳跟未煞車，氣不沉。`;
-                    else if (diff < -2) analysis += `✅ 心率下降，副交感激活，科技樁有效！腳跟踩實成功。`;
-                    else analysis += `📉 心率持平，可能剛入門，需強化「肋骨找恥骨」增加呼氣效率。`;
-                } else analysis += `💡 請填入站前/站後心率，才能精準分析煞車效能。`;
-
-                if (spo2 < 95 && spo2 > 0) analysis += ` ❗ 血氧偏低 (${spo2}%)，死氣積累，氣未循環，優先練「呼吸氣徹腳底」。`;
-                else if (spo2 >= 96) analysis += ` ✔️ 血氧理想，氧氣交換不錯。`;
-
-                analysis += ` 重心偏向${重心}，${strategy}主導。若「髖策略」在不該出現的場景啟用，則膝蓋、腰背皆代償。`;
-                document.getElementById('neuroResult').innerHTML = `🧾 神經力學解讀：${analysis}`;
-            });
-        }
-    }
-
-    // 初始化所有筆記內容，僅在驗證成功後顯示
-    function initNotes() {
-        buildQuiz();
-        bindQuizEvents();
-        bindDataSave();
+    
+    // 頁面加載時檢查是否已解鎖
+    if (checkAlreadyUnlocked()) {
+        document.getElementById('passwordScreen').classList.add('hidden');
         document.getElementById('mainContent').classList.remove('hidden');
-        document.getElementById('lockOverlay')?.classList.add('hidden');
     }
-
-    // 執行一次性密碼驗證
-    const isValid = validateOneTimePassword();
-    if (isValid) {
-        initNotes();
-    } else {
-        // 已在 showLockScreen 處理顯示
-        document.getElementById('mainContent')?.classList.add('hidden');
-    }
-    bindBackButton();
+    
+    // 綁定解鎖按鈕
+    document.getElementById('unlockBtn').addEventListener('click', () => {
+        const pwd = document.getElementById('passwordInput').value;
+        if (!pwd) {
+            document.getElementById('passwordError').innerText = "請輸入密碼";
+            return;
+        }
+        unlockNotes(pwd);
+    });
+    
+    // 允許 Enter 鍵提交
+    document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('unlockBtn').click();
+        }
+    });
+    
+    // ---------- 筆記互動功能 ----------
+    document.getElementById('saveNeuroBtn')?.addEventListener('click', () => {
+        const hrBefore = parseInt(document.getElementById('hrBefore').value) || 0;
+        const hrAfter = parseInt(document.getElementById('hrAfter').value) || 0;
+        const spo2 = parseInt(document.getElementById('spo2').value) || 0;
+        const重心 = document.getElementById('重心').value;
+        const strategy = document.getElementById('strategy').value;
+        let analysis = '';
+        if (hrBefore > 0 && hrAfter > 0) {
+            const diff = hrAfter - hrBefore;
+            if (diff > 3) analysis += `⚠️ 站樁後心率上升 ${diff} bpm，代表「髖策略主導」`;
+            else if (diff < -2) analysis += `✅ 心率下降，科技樁有效！`;
+            else analysis += `📉 心率持平，需強化「肋骨找恥骨」`;
+        }
+        if (spo2 < 95 && spo2 > 0) analysis += ` ❗ 血氧偏低，死氣積累`;
+        else if (spo2 >= 96) analysis += ` ✔️ 血氧理想`;
+        analysis += ` 重心偏向${重心}，${strategy}主導。`;
+        document.getElementById('neuroResult').innerHTML = `🧾 ${analysis}`;
+    });
 </script>
 </body>
 </html>
