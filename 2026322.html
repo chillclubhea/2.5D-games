@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Gavin Chan 神經力學筆記 | 移動的呼吸：科技樁與步態重建</title>
+    <title>Gavin Chan 神經力學筆記 | 科技樁與步態重建 · 學員專屬</title>
     <style>
         * {
             margin: 0;
@@ -24,7 +24,6 @@
             margin: 0 auto;
         }
 
-        /* 科技感藍色調 */
         :root {
             --primary: #2B6EF0;
             --primary-glow: #1E4FCF;
@@ -84,7 +83,6 @@
             gap: 1.8rem;
         }
 
-        /* 數據表單樣式 */
         .data-form {
             display: flex;
             flex-direction: column;
@@ -205,18 +203,61 @@
             border-radius: 12px;
         }
 
-        .code-block {
-            font-family: monospace;
-            background: #0a0e16;
-            padding: 0.3rem 0.6rem;
-            border-radius: 12px;
+        /* 封鎖頁面樣式 */
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #03060E;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(12px);
+        }
+        .lock-card {
+            background: #0F1422;
+            border-radius: 48px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 480px;
+            border: 1px solid #FF4D4D;
+            box-shadow: 0 0 30px rgba(255,50,50,0.2);
+        }
+        .lock-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .lock-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FF7A5C;
+        }
+        .lock-sub {
+            color: #B0BBD5;
+            margin: 1rem 0;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-<div class="container">
+<div id="lockOverlay" class="lock-screen hidden">
+    <div class="lock-card">
+        <div class="lock-icon">🔒⛔</div>
+        <div class="lock-title">一次性密碼已失效</div>
+        <div class="lock-sub">此密碼已被其他裝置啟用或超過授權次數。<br>根據 Gavin 神經力學協議，每個密碼僅限單一裝置使用。<br>請重新獲取新的密碼。</div>
+        <button id="backToGenerator" style="background:#3A2C2C; margin-top:1rem;">返回密碼生成器</button>
+    </div>
+</div>
+
+<div id="mainContent" class="container hidden">
     <h1>🧠 神經力學筆記 · 移動的呼吸</h1>
-    <div class="subhead">科技樁 × 步態重建 | 講師：Gavin Chan 代謝修復專家</div>
+    <div class="subhead">科技樁 × 步態重建 | 講師：Gavin Chan 代謝修復專家 | 學員專屬 · 一次性授權</div>
 
     <!-- 1. 個人神經力學數據區 -->
     <div class="card">
@@ -240,13 +281,11 @@
         </div>
     </div>
 
-    <!-- 2. 真假 X型腿/代償 鑑別清單 (對比表格) -->
+    <!-- 2. 真假 X型腿/代償 鑑別清單 -->
     <div class="card">
         <h2>🔍 真假X型腿／代償鑑別清單</h2>
         <table>
-            <thead>
-                <tr><th>結構性異常 (教科書版)</th><th>神經性假代償 (Gavin 版)</th></tr>
-            </thead>
+            <thead><tr><th>結構性異常 (教科書版)</th><th>神經性假代償 (Gavin 版)</th></tr></thead>
             <tbody>
                 <tr><td>骨骼角度異常 >15° 股骨內旋</td><td>⚠️ 力學鏈條崩潰：踝策略失靈 → 髖鎖死 → 膝被迫內扣</td></tr>
                 <tr><td>膝外翻/內翻基因遺傳</td><td>🧬 神經性代償：大腦為了「不跌倒」強迫膝關節扭轉，並非骨頭變形</td></tr>
@@ -257,7 +296,7 @@
         <div class="insight">💡 Gavin 提醒：不要被「形狀」騙了，大腦選擇最省力的歪斜，不是骨頭壞掉，是力學斷線。</div>
     </div>
 
-    <!-- 3. 核心知識點濃縮 (Gavin精華) -->
+    <!-- 3. 核心知識點濃縮 -->
     <div class="grid-2">
         <div class="card">
             <h3>👣 站立位代償三部曲</h3>
@@ -281,7 +320,7 @@
         </div>
     </div>
 
-    <!-- 4. 10題神經偵探自我檢測 (互動計分) -->
+    <!-- 4. 10題神經偵探自我檢測 -->
     <div class="card">
         <h2>🕵️ 神經偵探自我檢測</h2>
         <div id="quizContainer"></div>
@@ -289,7 +328,7 @@
         <div id="quizResult" class="result-area"></div>
     </div>
 
-    <!-- 5. 老祖宗智慧專區 (成語聯覺) -->
+    <!-- 5. 老祖宗智慧專區 -->
     <div class="card">
         <h2>🏮 老祖宗智慧專區 · 成語神經力學</h2>
         <div class="grid-2">
@@ -301,7 +340,7 @@
         <div class="insight">✨ Gavin 解讀：成語是千年的神經編程，看懂的人，用站樁就能調呼吸、正骨架。</div>
     </div>
 
-    <!-- 6. 下堂課預告 + 結尾轉化 -->
+    <!-- 6. 下堂課預告 -->
     <div class="card">
         <h2>🔮 下堂課預告：破解身體的「偏見」</h2>
         <p><strong>順代償 vs 逆代償</strong> — 左側骨盆旋前、右側骨盆旋後，是真長短腿還是神經「偏見」？如何用科技樁修正高低肩、長短腿，讓左右腦平衡。</p>
@@ -317,7 +356,106 @@
 </div>
 
 <script>
-    // 10 題神經偵探題庫 (題目, 選項, 正確答案索引, 解析)
+    // ------------------- 一次性密碼 + 裝置指紋封鎖邏輯 -------------------
+    const STORAGE_KEY_PREFIX = "GavinNeuro_";
+    let currentValidCode = null;
+
+    // 生成簡單裝置指紋 (基於用戶代理 + 屏幕解析度 + 時區 + 語言，足夠唯一性)
+    function getDeviceFingerprint() {
+        const nav = navigator;
+        let fingerprint = [
+            nav.userAgent,
+            screen.width + "x" + screen.height + "x" + screen.colorDepth,
+            new Date().getTimezoneOffset(),
+            nav.language || nav.userLanguage,
+            nav.hardwareConcurrency || "unknown"
+        ].join("|");
+        // 簡單hash (非加密但用於比對)
+        let hash = 0;
+        for (let i = 0; i < fingerprint.length; i++) {
+            hash = ((hash << 5) - hash) + fingerprint.charCodeAt(i);
+            hash |= 0;
+        }
+        return Math.abs(hash).toString(36);
+    }
+
+    // 驗證一次性密碼（URL參數傳入 code, ts）
+    function validateOneTimePassword() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let encodedCode = urlParams.get('code');
+        const timestamp = urlParams.get('ts');
+        if (!encodedCode) {
+            showLockScreen("無效存取：未提供密碼憑證");
+            return false;
+        }
+        try {
+            currentValidCode = atob(decodeURIComponent(encodedCode));
+        } catch(e) {
+            showLockScreen("密碼格式錯誤");
+            return false;
+        }
+        if (!currentValidCode || currentValidCode.length < 8) {
+            showLockScreen("一次性密碼無效");
+            return false;
+        }
+
+        const deviceId = getDeviceFingerprint();
+        const storedKey = STORAGE_KEY_PREFIX + currentValidCode;
+        const storedDataRaw = localStorage.getItem(storedKey);
+
+        // 無記錄 -> 首次啟用，儲存裝置指紋 + 時間戳
+        if (!storedDataRaw) {
+            const record = {
+                device: deviceId,
+                firstAccess: timestamp || Date.now(),
+                used: true
+            };
+            localStorage.setItem(storedKey, JSON.stringify(record));
+            return true;
+        }
+
+        // 已有記錄 -> 比對裝置指紋
+        try {
+            const record = JSON.parse(storedDataRaw);
+            if (record.device === deviceId) {
+                // 同裝置再次刷新頁面允許 (合理範圍)
+                return true;
+            } else {
+                // 不同裝置嘗試使用同一密碼 -> 永久封鎖該密碼，並顯示警告
+                // 同時清除本地記錄避免繞過 (直接鎖)
+                showLockScreen(`⚠️ 一次性密碼 ${currentValidCode} 已被其他裝置使用。\n根據神經力學協議，密碼失效且帳戶已封鎖。請重新取得新密碼。`);
+                // 清除該密碼記錄，讓後續連線也無法再使用 (標記為blocked)
+                localStorage.setItem(storedKey + "_blocked", "true");
+                return false;
+            }
+        } catch (err) {
+            showLockScreen("驗證失敗，請重新產生密碼");
+            return false;
+        }
+    }
+
+    function showLockScreen(message) {
+        const lockDiv = document.getElementById('lockOverlay');
+        const mainDiv = document.getElementById('mainContent');
+        if (lockDiv) {
+            lockDiv.classList.remove('hidden');
+            const subElem = lockDiv.querySelector('.lock-sub');
+            if (subElem) subElem.innerHTML = message + "<br><br>請返回密碼生成器，產生新的一次性密碼。";
+        }
+        if (mainDiv) mainDiv.classList.add('hidden');
+    }
+
+    // 返回生成器按鈕
+    function bindBackButton() {
+        const backBtn = document.getElementById('backToGenerator');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                window.location.href = "gavin_password_generator.html";
+            });
+        }
+    }
+
+    // ------------------- 原本筆記的所有互動功能 (保留完整) -------------------
     const quizData = [
         { q: "1. 刷牙洗臉時腰酸，問題主要出在？", options: ["腰椎間盤突出", "髖關節夾擠", "踝策略失效，骨盆代償"], correct: 2, explanation: "Gavin 解析：踝策略失效，身體前傾時腳後跟煞不住，腰背肌肉被迫夾緊代償，跟腰椎無關！" },
         { q: "2. 站樁時心率反而上升，代表？", options: ["站得不夠久", "交感持續亢奮，髖策略主導", "有效練到心肺"], correct: 1, explanation: "錯！站樁心率不降反升，代表你仍卡在「推進位」，用肌肉死撐，根本沒啟動副交感。" },
@@ -333,6 +471,7 @@
 
     function buildQuiz() {
         const container = document.getElementById('quizContainer');
+        if (!container) return;
         container.innerHTML = '';
         quizData.forEach((item, idx) => {
             const div = document.createElement('div');
@@ -372,43 +511,68 @@
         return { score, explanations };
     }
 
-    document.getElementById('submitQuiz').addEventListener('click', () => {
-        const { score, explanations } = computeScore();
-        const total = quizData.length;
-        let gradeMsg = '';
-        if (score >= 8) gradeMsg = '🧠 神經偵探大師級！你已經能用 Gavin 視角看身體。';
-        else if (score >= 5) gradeMsg = '🕵️‍♂️ 具備偵探潛力，再多觀察「踝策略」與代償鏈。';
-        else gradeMsg = '📡 神經力學尚待校準，回頭複習「腳跟煞車」與「真假X型腿」章節。';
-        const resultHtml = `<strong>得分：${score} / ${total}</strong><br>${gradeMsg}<br><br>` + 
-            explanations.map(e => `<div class="insight" style="margin-top:6px;">${e}</div>`).join('');
-        document.getElementById('quizResult').innerHTML = resultHtml;
-    });
+    function bindQuizEvents() {
+        const submitBtn = document.getElementById('submitQuiz');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                const { score, explanations } = computeScore();
+                const total = quizData.length;
+                let gradeMsg = '';
+                if (score >= 8) gradeMsg = '🧠 神經偵探大師級！你已經能用 Gavin 視角看身體。';
+                else if (score >= 5) gradeMsg = '🕵️‍♂️ 具備偵探潛力，再多觀察「踝策略」與代償鏈。';
+                else gradeMsg = '📡 神經力學尚待校準，回頭複習「腳跟煞車」與「真假X型腿」章節。';
+                const resultHtml = `<strong>得分：${score} / ${total}</strong><br>${gradeMsg}<br><br>` + 
+                    explanations.map(e => `<div class="insight" style="margin-top:6px;">${e}</div>`).join('');
+                document.getElementById('quizResult').innerHTML = resultHtml;
+            });
+        }
+    }
 
-    // 神經力學數據儲存模擬與分析
-    document.getElementById('saveNeuroBtn').addEventListener('click', () => {
-        const hrBefore = parseInt(document.getElementById('hrBefore').value) || 0;
-        const hrAfter = parseInt(document.getElementById('hrAfter').value) || 0;
-        const spo2 = parseInt(document.getElementById('spo2').value) || 0;
-        const重心 = document.getElementById('重心').value;
-        const strategy = document.getElementById('strategy').value;
+    function bindDataSave() {
+        const saveBtn = document.getElementById('saveNeuroBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const hrBefore = parseInt(document.getElementById('hrBefore').value) || 0;
+                const hrAfter = parseInt(document.getElementById('hrAfter').value) || 0;
+                const spo2 = parseInt(document.getElementById('spo2').value) || 0;
+                const重心 = document.getElementById('重心').value;
+                const strategy = document.getElementById('strategy').value;
 
-        let analysis = '';
-        if (hrBefore > 0 && hrAfter > 0) {
-            const diff = hrAfter - hrBefore;
-            if (diff > 3) analysis += `⚠️ 站樁後心率上升 ${diff} bpm，代表「髖策略主導」，腳跟未煞車，氣不沉。`;
-            else if (diff < -2) analysis += `✅ 心率下降，副交感激活，科技樁有效！腳跟踩實成功。`;
-            else analysis += `📉 心率持平，可能剛入門，需強化「肋骨找恥骨」增加呼氣效率。`;
-        } else analysis += `💡 請填入站前/站後心率，才能精準分析煞車效能。`;
+                let analysis = '';
+                if (hrBefore > 0 && hrAfter > 0) {
+                    const diff = hrAfter - hrBefore;
+                    if (diff > 3) analysis += `⚠️ 站樁後心率上升 ${diff} bpm，代表「髖策略主導」，腳跟未煞車，氣不沉。`;
+                    else if (diff < -2) analysis += `✅ 心率下降，副交感激活，科技樁有效！腳跟踩實成功。`;
+                    else analysis += `📉 心率持平，可能剛入門，需強化「肋骨找恥骨」增加呼氣效率。`;
+                } else analysis += `💡 請填入站前/站後心率，才能精準分析煞車效能。`;
 
-        if (spo2 < 95 && spo2 > 0) analysis += ` ❗ 血氧偏低 (${spo2}%)，死氣積累，氣未循環，優先練「呼吸氣徹腳底」。`;
-        else if (spo2 >= 96) analysis += ` ✔️ 血氧理想，氧氣交換不錯。`;
+                if (spo2 < 95 && spo2 > 0) analysis += ` ❗ 血氧偏低 (${spo2}%)，死氣積累，氣未循環，優先練「呼吸氣徹腳底」。`;
+                else if (spo2 >= 96) analysis += ` ✔️ 血氧理想，氧氣交換不錯。`;
 
-        analysis += ` 重心偏向${重心}，${strategy}主導。若「髖策略」在不該出現的場景啟用，則膝蓋、腰背皆代償。`;
+                analysis += ` 重心偏向${重心}，${strategy}主導。若「髖策略」在不該出現的場景啟用，則膝蓋、腰背皆代償。`;
+                document.getElementById('neuroResult').innerHTML = `🧾 神經力學解讀：${analysis}`;
+            });
+        }
+    }
 
-        document.getElementById('neuroResult').innerHTML = `🧾 神經力學解讀：${analysis}`;
-    });
+    // 初始化所有筆記內容，僅在驗證成功後顯示
+    function initNotes() {
+        buildQuiz();
+        bindQuizEvents();
+        bindDataSave();
+        document.getElementById('mainContent').classList.remove('hidden');
+        document.getElementById('lockOverlay')?.classList.add('hidden');
+    }
 
-    buildQuiz();
+    // 執行一次性密碼驗證
+    const isValid = validateOneTimePassword();
+    if (isValid) {
+        initNotes();
+    } else {
+        // 已在 showLockScreen 處理顯示
+        document.getElementById('mainContent')?.classList.add('hidden');
+    }
+    bindBackButton();
 </script>
 </body>
 </html>
