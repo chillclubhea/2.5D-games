@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Gavin Chan 神經力學筆記 | 移動的呼吸 · 學員專屬</title>
+    <title>Gavin Chan 神經力學筆記 | 移動的呼吸：科技樁與步態重建</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             background: #0A0F1E;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             color: #E9F1FC;
             line-height: 1.5;
             padding: 2rem 1rem;
@@ -24,6 +24,7 @@
             margin: 0 auto;
         }
 
+        /* 科技感藍色調 */
         :root {
             --primary: #2B6EF0;
             --primary-glow: #1E4FCF;
@@ -34,20 +35,22 @@
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 2.1rem;
+            font-weight: 600;
             background: linear-gradient(135deg, #FFFFFF, var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: -0.3px;
             margin-bottom: 0.3rem;
         }
 
         h2 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 500;
             border-left: 4px solid var(--primary);
             padding-left: 1rem;
-            margin: 1.5rem 0 1rem 0;
+            margin: 2rem 0 1rem 0;
         }
 
         h3 {
@@ -61,7 +64,7 @@
             color: var(--text-muted);
             margin-bottom: 2rem;
             border-bottom: 1px solid var(--border-dim);
-            padding-bottom: 0.5rem;
+            padding-bottom: 1rem;
         }
 
         .card {
@@ -69,7 +72,7 @@
             border-radius: 28px;
             border: 1px solid var(--border-dim);
             padding: 1.5rem;
-            margin-bottom: 1.8rem;
+            margin-bottom: 2rem;
             backdrop-filter: blur(2px);
             transition: all 0.2s ease;
             box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
@@ -78,14 +81,45 @@
         .grid-2 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
+            gap: 1.8rem;
+        }
+
+        /* 數據表單樣式 */
+        .data-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .data-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-dim);
+            padding: 0.6rem 0;
+        }
+
+        .data-label {
+            font-weight: 500;
+            width: 160px;
+        }
+
+        .data-input {
+            background: #1E2533;
+            border: 1px solid var(--border-dim);
+            border-radius: 40px;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            width: 120px;
+            text-align: center;
         }
 
         .badge {
             background: var(--primary-glow);
             border-radius: 40px;
             padding: 0.2rem 0.8rem;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 500;
             display: inline-block;
         }
@@ -98,7 +132,7 @@
 
         th, td {
             border: 1px solid var(--border-dim);
-            padding: 10px;
+            padding: 12px 8px;
             text-align: left;
             vertical-align: top;
         }
@@ -154,6 +188,15 @@
             border-left: 3px solid var(--accent);
         }
 
+        .footer-note {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-dim);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
         .insight {
             background: rgba(43,110,240,0.1);
             border-left: 3px solid var(--primary);
@@ -162,470 +205,142 @@
             border-radius: 12px;
         }
 
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid var(--border-dim);
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .data-label {
-            font-weight: 500;
-            min-width: 140px;
-        }
-
-        .data-input {
-            background: #1E2533;
-            border: 1px solid var(--border-dim);
-            border-radius: 40px;
-            padding: 0.4rem 0.8rem;
-            color: white;
-            width: 120px;
-            text-align: center;
-        }
-
-        select.data-input {
-            width: 140px;
-        }
-
-        .footer-note {
-            text-align: center;
-            margin-top: 2rem;
-            padding: 1rem;
-            border-top: 1px solid var(--border-dim);
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* 密碼輸入頁面 */
-        .password-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #03060E;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .password-card {
-            background: #11161F;
-            border-radius: 48px;
-            padding: 2.5rem;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            border: 1px solid var(--primary);
-        }
-
-        .password-input {
-            background: #1E2533;
-            border: 1px solid var(--border-dim);
-            border-radius: 60px;
-            padding: 1rem;
-            width: 100%;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            text-align: center;
-            color: white;
+        .code-block {
             font-family: monospace;
-            margin: 1.5rem 0;
-        }
-
-        .error-msg {
-            color: #FF7A5C;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .highlight {
-            background: rgba(0,212,255,0.1);
-            border-radius: 12px;
+            background: #0a0e16;
             padding: 0.3rem 0.6rem;
-        }
-
-        .step-icon {
-            display: inline-block;
-            width: 28px;
-            height: 28px;
-            background: var(--primary);
-            border-radius: 30px;
-            text-align: center;
-            line-height: 28px;
-            font-weight: bold;
-            margin-right: 10px;
+            border-radius: 12px;
         }
     </style>
 </head>
 <body>
-
-<!-- 密碼輸入頁面 -->
-<div id="passwordScreen" class="password-screen">
-    <div class="password-card">
-        <h1>🔐 Gavin 神經力學筆記</h1>
-        <p style="color: #8A99B4; margin: 0.5rem 0;">移動的呼吸 · 科技樁與步態重建</p>
-        <p style="font-size: 0.85rem; margin: 1rem 0;">請輸入講師給予的專屬密碼</p>
-        <input type="text" id="passwordInput" class="password-input" placeholder="輸入 4 位數字密碼" maxlength="4" autocomplete="off" pattern="\d*" inputmode="numeric">
-        <div id="passwordError" class="error-msg"></div>
-        <button id="unlockBtn" style="margin-top: 1rem;">🔓 解鎖筆記</button>
-        <p style="font-size: 0.7rem; color: #5A6A8A; margin-top: 1.5rem;">每個密碼僅限單一裝置使用，重新整理仍可繼續瀏覽</p>
-    </div>
-</div>
-
-<!-- 主要筆記內容 (初始隱藏) -->
-<div id="mainContent" class="container hidden">
+<div class="container">
     <h1>🧠 神經力學筆記 · 移動的呼吸</h1>
-    <div class="subhead">科技樁 × 步態重建 | 講師：Gavin Chan 代謝修復專家 | 學員專屬筆記</div>
+    <div class="subhead">科技樁 × 步態重建 | 講師：Gavin Chan 代謝修復專家</div>
 
-    <!-- ========== 第一章：地基與大樓 ========== -->
+    <!-- 1. 個人神經力學數據區 -->
     <div class="card">
-        <h2>🏗️ 第一章：地基與大樓</h2>
-        <div class="insight">💡 核心觀念：膝蓋是受害者，腳底才是肇事者。你的腳，是身體的「地基」。</div>
-        
-        <h3>📋 你的疼痛地圖</h3>
-        <div class="data-row"><span class="data-label">膝蓋痛 (左/右/無)</span><input type="text" id="painKnee" class="data-input" placeholder="左/右/無"></div>
-        <div class="data-row"><span class="data-label">腰酸背痛 (是/否)</span><input type="text" id="painBack" class="data-input" placeholder="是/否"></div>
-        <div class="data-row"><span class="data-label">足底不適 (是/否)</span><input type="text" id="painFoot" class="data-input" placeholder="是/否"></div>
-        <div class="data-row"><span class="data-label">肩頸僵硬 (是/否)</span><input type="text" id="painNeck" class="data-input" placeholder="是/否"></div>
-        <button id="savePainBtn">📌 儲存疼痛記錄</button>
-        
-        <h3>🦶 自我觀察：你的腳在說話</h3>
-        <div class="data-row"><span class="data-label">足弓類型</span><select id="footArch" class="data-input"><option>正常足弓</option><option>扁平足</option><option>高足弓</option></select></div>
-        <div class="data-row"><span class="data-label">拇趾外翻 (有/無)</span><input type="text" id="bunion" class="data-input" placeholder="有/無"></div>
-        <div class="data-row"><span class="data-label">鞋底磨損狀況</span><select id="shoeWear" class="data-input"><option>內側磨損多</option><option>外側磨損多</option><option>均勻磨損</option></select></div>
-    </div>
-
-    <!-- ========== 第二章：步態密碼 ========== -->
-    <div class="card">
-        <h2>🚶 第二章：步態密碼</h2>
-        <div class="insight">🔑 關鍵：支撐期佔60%，穩定重於移動；腳後跟是剎車，前腳掌是油門。</div>
-        <div class="data-row"><span class="data-label">走路時感覺哪邊先落地？</span><select id="gaitHeel" class="data-input"><option>腳後跟先落地</option><option>前腳掌先落地</option><option>全腳掌同時</option></select></div>
-        <div class="data-row"><span class="data-label">走路時膝蓋是否內扣？</span><select id="gaitKnee" class="data-input"><option>從不</option><option>偶爾</option><option>經常</option></select></div>
-        <button id="saveGaitBtn">📌 儲存步態觀察</button>
-    </div>
-
-    <!-- ========== 第三章：腦的選擇 ========== -->
-    <div class="card">
-        <h2>🧠 第三章：腦的選擇——你的策略是什麼？</h2>
-        <div class="insight">⚡ 踝策略 → 健康；髖策略 → 代償；邁步策略 → 警訊</div>
-        
-        <h3>🔍 自我檢測：屁股偵探</h3>
-        <div class="data-row"><span class="data-label">站直，身體重心往前移，屁股會夾緊嗎？</span><select id="testButt" class="data-input"><option>不會，屁股放鬆</option><option>會，不自覺夾緊</option></select></div>
-        <div class="data-row"><span class="data-label">站樁時心率變化</span><input type="text" id="hrChange" class="data-input" placeholder="上升/下降/持平"></div>
-        <div class="data-row"><span class="data-label">支撐策略傾向</span><select id="strategySelf" class="data-input"><option>踝策略</option><option>髖策略</option><option>邁步策略</option></select></div>
-        <button id="saveStrategyBtn">📌 儲存策略評估</button>
-        <div id="strategyAdvice" class="result-area"></div>
-    </div>
-
-    <!-- ========== 第四章：科技樁實作 ========== -->
-    <div class="card">
-        <h2>🧘 第四章：科技樁——從站樁重建地基</h2>
-        <div class="grid-2">
-            <div>
-                <h3>📊 站樁數據記錄</h3>
-                <div class="data-row"><span class="data-label">站前心率</span><input type="number" id="hrBefore" class="data-input" placeholder="bpm"></div>
-                <div class="data-row"><span class="data-label">站後心率</span><input type="number" id="hrAfter" class="data-input" placeholder="bpm"></div>
-                <div class="data-row"><span class="data-label">血氧飽和度 (%)</span><input type="number" id="spo2" class="data-input" placeholder="95-99"></div>
-                <div class="data-row"><span class="data-label">站樁佔距</span><select id="stanceWidth" class="data-input"><option>窄距 (與髖同寬)</option><option>中距 (與肩同寬)</option><option>寬距 (寬於肩)</option></select></div>
-                <div class="data-row"><span class="data-label">腳尖方向</span><select id="toeDir" class="data-input"><option>朝前</option><option>外八</option><option>內八</option></select></div>
-                <button id="saveZhanBtn">📌 儲存站樁數據</button>
-                <div id="zhanAnalysis" class="result-area"></div>
+        <h2>📊 你的神經力學數據檔案</h2>
+        <div class="data-form" id="neuroDataForm">
+            <div class="data-row"><span class="data-label">靜態心率 (站前)</span><input type="number" id="hrBefore" class="data-input" placeholder="bpm"></div>
+            <div class="data-row"><span class="data-label">靜態心率 (站樁後)</span><input type="number" id="hrAfter" class="data-input" placeholder="bpm"></div>
+            <div class="data-row"><span class="data-label">血氧飽和度 (%)</span><input type="number" id="spo2" class="data-input" placeholder="96-99"></div>
+            <div class="data-row"><span class="data-label">身體重心偏向</span>
+                <select id="重心" class="data-input" style="width:140px">
+                    <option>左側承重</option><option>右側承重</option><option>居中</option>
+                </select>
             </div>
-            <div>
-                <h3>✅ 科技樁四大金律自檢</h3>
-                <div class="data-row"><span class="data-label">腳跟踩實</span><select id="rule1" class="data-input"><option>是</option><option>否</option></select></div>
-                <div class="data-row"><span class="data-label">屁股放鬆</span><select id="rule2" class="data-input"><option>是</option><option>否</option></select></div>
-                <div class="data-row"><span class="data-label">肋骨找恥骨</span><select id="rule3" class="data-input"><option>是</option><option>否</option></select></div>
-                <div class="data-row"><span class="data-label">呼吸氣徹腳底</span><select id="rule4" class="data-input"><option>是</option><option>否</option></select></div>
-                <button id="checkRulesBtn">🔍 檢測四大金律</button>
-                <div id="rulesResult" class="result-area"></div>
+            <div class="data-row"><span class="data-label">支撐策略 (站姿微晃)</span>
+                <select id="strategy" class="data-input">
+                    <option>踝策略</option><option>髖策略</option><option>邁步策略</option>
+                </select>
             </div>
+            <button id="saveNeuroBtn">📌 儲存當下數據</button>
+            <div id="neuroResult" class="result-area">👉 儲存後將分析：心率差反映「煞車效能」，血氧低於95%代表死氣積累。</div>
         </div>
     </div>
 
-    <!-- ========== 從坐到站專區 ========== -->
+    <!-- 2. 真假 X型腿/代償 鑑別清單 (對比表格) -->
     <div class="card">
-        <h2>🪑 從坐到站：步態的起點</h2>
-        <div class="insight">🚀 站起的品質，決定步態的品質。70%動力來自腹肌+臀肌！</div>
-        <div class="grid-2">
-            <div>
-                <h3>📋 站起自我檢測</h3>
-                <div class="data-row"><span class="data-label">身體前傾是否過度？</span><select id="standFwd" class="data-input"><option>適中</option><option>過度前傾</option><option>幾乎不前傾</option></select></div>
-                <div class="data-row"><span class="data-label">膝蓋是否內扣？</span><select id="standKnee" class="data-input"><option>無</option><option>有</option></select></div>
-                <div class="data-row"><span class="data-label">站起時是否憋氣？</span><select id="standHold" class="data-input"><option>否，自然呼氣</option><option>是，憋氣用力</option></select></div>
-                <div class="data-row"><span class="data-label">兩邊是否同時用力？</span><select id="standSym" class="data-input"><option>是，對稱</option><option>否，一側先起來</option></select></div>
-                <button id="saveStandBtn">📌 儲存站起評估</button>
-            </div>
-            <div>
-                <h3>💪 站起呼吸練習</h3>
-                <div class="insight">正確模式：前傾吸氣 → 離座用力呼氣 → 直立自然換氣</div>
-                <p>試著做三次慢速起立，每次呼氣時想像把身體「吹」起來。記錄感受：</p>
-                <textarea id="standFeel" rows="3" style="width:100%; background:#1E2533; border:1px solid var(--border-dim); border-radius:16px; padding:0.5rem; color:white;" placeholder="練習後身體感覺..."></textarea>
-                <button id="saveStandFeelBtn">💾 儲存練習筆記</button>
-            </div>
+        <h2>🔍 真假X型腿／代償鑑別清單</h2>
+        <table>
+            <thead>
+                <tr><th>結構性異常 (教科書版)</th><th>神經性假代償 (Gavin 版)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>骨骼角度異常 >15° 股骨內旋</td><td>⚠️ 力學鏈條崩潰：踝策略失靈 → 髖鎖死 → 膝被迫內扣</td></tr>
+                <tr><td>膝外翻/內翻基因遺傳</td><td>🧬 神經性代償：大腦為了「不跌倒」強迫膝關節扭轉，並非骨頭變形</td></tr>
+                <tr><td>專注矯形鞋墊、切骨手術</td><td>⚡ 優先解鎖足弓升降 + 髖內旋，膝蓋自然回正，「肇事者」在腳底</td></tr>
+                <tr><td>扁平足 = 足弓塌陷</td><td>🦶 功能性高足弓：脛骨外旋卡死，視覺扁平，實則高弓→ 練錯更糟</td></tr>
+            </tbody>
+        </table>
+        <div class="insight">💡 Gavin 提醒：不要被「形狀」騙了，大腦選擇最省力的歪斜，不是骨頭壞掉，是力學斷線。</div>
+    </div>
+
+    <!-- 3. 核心知識點濃縮 (Gavin精華) -->
+    <div class="grid-2">
+        <div class="card">
+            <h3>👣 站立位代償三部曲</h3>
+            <p>1️⃣ 腳底失能 → 踝策略失效 → 腳後跟「煞車」不靈。<br>
+            2️⃣ 大腦強制啟動髖策略 → 屁股夾緊，骶骨鎖死 → 骨盆底肌失能。<br>
+            3️⃣ 膝蓋成為受害者 → 半月板、韌帶承受扭轉剪力 → 疼痛警報響起。<br>
+            <span class="badge">膝蓋是受害者，腳底是肇事者</span></p>
+        </div>
+        <div class="card">
+            <h3>🧘 科技樁四大金律</h3>
+            <p>✅ 腳跟踩實 —— 重啟「煞車」，讓心率降下來。<br>
+            ✅ 屁股放鬆 —— 抑制髖策略，恢復骨盆底肌律動。<br>
+            ✅ 肋骨找恥骨 —— 關閉肋骨外翻，啟動腹式呼氣。<br>
+            ✅ 呼吸氣徹腳底 —— 意念引導，讓氣流動，死氣變活氣。</p>
+        </div>
+        <div class="card">
+            <h3>⚙️ 策略分級 (站/走)</h3>
+            <p>🔹 踝策略：日常站立、輕微晃動，只動腳踝，省力穩定。<br>
+            🔸 髖策略：身體超出腳的投影面積50%時啟動，臀肌輔助平衡。<br>
+            🔹 邁步策略：最後防線。若你站著不動就夾臀，代表踝策略崩潰，超前使用髖策略 → 慢性破壞。</p>
         </div>
     </div>
 
-    <!-- ========== 神經偵探：10題自我測驗 ========== -->
+    <!-- 4. 10題神經偵探自我檢測 (互動計分) -->
     <div class="card">
-        <h2>🕵️ 神經偵探：你的步態智商測試</h2>
+        <h2>🕵️ 神經偵探自我檢測</h2>
         <div id="quizContainer"></div>
-        <button id="submitQuiz">🔎 提交答案 & 看解析</button>
+        <button id="submitQuiz">🔎 提交答案 & 看 Gavin 解析</button>
         <div id="quizResult" class="result-area"></div>
     </div>
 
-    <!-- ========== 老祖宗智慧 & 下堂預告 ========== -->
+    <!-- 5. 老祖宗智慧專區 (成語聯覺) -->
     <div class="card">
-        <h2>🏮 老祖宗智慧專區</h2>
+        <h2>🏮 老祖宗智慧專區 · 成語神經力學</h2>
         <div class="grid-2">
-            <div><span class="badge">虛靈頂勁</span> — 頭頸虛懸，激活迷走神經，讓交感剎車</div>
-            <div><span class="badge">落地生根</span> — 腳跟壓地，啟動踝策略</div>
-            <div><span class="badge">反求諸己</span> — 膝痛腰酸，往腳底找答案</div>
-            <div><span class="badge">以靜制動</span> — 科技樁抑制交感過激</div>
+            <div><span class="badge">虛靈頂勁</span> — 頭頸虛懸，激活迷走神經，讓交感剎車；站樁時頸部一圈「虛」，才能氣血流暢。</div>
+            <div><span class="badge">落地生根</span> — 腳跟壓地，啟動踝策略，把重心「種」下去，身體才會穩如泰山。</div>
+            <div><span class="badge">反求諸己</span> — 膝痛腰酸時，不怨關節，往腳底找答案。神經系統代償，根源在腳。</div>
+            <div><span class="badge">以靜制動</span> — 科技樁用靜止狀態，抑制交感過激，讓身體自己修復，而非蠻力訓練。</div>
         </div>
-        <div class="insight">✨ Gavin 解讀：成語是千年的神經編程，站樁即是現代版的「落地生根」。</div>
+        <div class="insight">✨ Gavin 解讀：成語是千年的神經編程，看懂的人，用站樁就能調呼吸、正骨架。</div>
     </div>
 
+    <!-- 6. 下堂課預告 + 結尾轉化 -->
     <div class="card">
         <h2>🔮 下堂課預告：破解身體的「偏見」</h2>
         <p><strong>順代償 vs 逆代償</strong> — 左側骨盆旋前、右側骨盆旋後，是真長短腿還是神經「偏見」？如何用科技樁修正高低肩、長短腿，讓左右腦平衡。</p>
-        <div style="background:#0F172F; border-radius:20px; padding:1rem; text-align:center; margin-top:1rem;">
-            🧬 這類代謝修復問題往往需要個性化評估<br>
-            📩 歡迎私訊「諮詢」獲取 Gavin 一對一策略
+        <p>🔥 你將學會：從步態讀懂身體的偏心，把「順代償」扭轉成穩定中軸。</p>
+        <div style="background: #0F172F; border-radius: 20px; padding: 1rem; margin: 1rem 0; text-align: center;">
+            🧬 這類代謝修復問題往往需要個性化評估，從神經力學重建步態，而非頭痛醫頭。<br>
+            📩 歡迎私訊「諮詢」獲取 Gavin 一對一策略。
         </div>
     </div>
-
     <div class="footer-note">
         © Gavin Chan 神經力學 · 數據說話 · 科技樁 ｜ 無評估，不康復。學會看步態，你就是自己的偵探。
     </div>
 </div>
 
 <script>
-    // ------------------- 一次性密碼驗證邏輯 (與講師端localStorage同步) -------------------
-    const STORAGE_KEY = "Gavin_Passwords_List_V2";   // 與講師密碼生成器共用
-    const UNLOCK_KEY = "Gavin_Unlocked_Device";
-
-    function getStoredPasswords() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                return JSON.parse(stored);
-            } catch(e) {
-                return [];
-            }
-        }
-        return [];
-    }
-
-    function validateAndUsePassword(code) {
-        const passwords = getStoredPasswords();
-        const idx = passwords.findIndex(p => p.code === code);
-        if (idx === -1) {
-            return { valid: false, message: "❌ 密碼無效，請確認後重新輸入" };
-        }
-        if (passwords[idx].status === "used") {
-            return { valid: false, message: "🔒 此密碼已被使用過，每個密碼僅限一人使用" };
-        }
-        if (passwords[idx].status === "active") {
-            // 標記為已使用
-            passwords[idx].status = "used";
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(passwords));
-            // 記錄此裝置已解鎖
-            localStorage.setItem(UNLOCK_KEY, code);
-            return { valid: true, message: "驗證成功", name: passwords[idx].name };
-        }
-        return { valid: false, message: "密碼狀態異常" };
-    }
-
-    function checkAlreadyUnlocked() {
-        const unlockedCode = localStorage.getItem(UNLOCK_KEY);
-        if (!unlockedCode) return false;
-        const passwords = getStoredPasswords();
-        const found = passwords.find(p => p.code === unlockedCode);
-        if (found && found.status === "used") return true;
-        localStorage.removeItem(UNLOCK_KEY);
-        return false;
-    }
-
-    function unlockNotes(password) {
-        const result = validateAndUsePassword(password.trim());
-        if (result.valid) {
-            document.getElementById('passwordScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-            // 可顯示歡迎訊息
-            console.log(`歡迎 ${result.name || '學員'} 進入筆記`);
-        } else {
-            document.getElementById('passwordError').innerText = result.message;
-        }
-    }
-
-    // 頁面加載時檢查是否已解鎖
-    if (checkAlreadyUnlocked()) {
-        document.getElementById('passwordScreen').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
-    }
-
-    document.getElementById('unlockBtn').addEventListener('click', () => {
-        const pwd = document.getElementById('passwordInput').value;
-        if (!pwd) {
-            document.getElementById('passwordError').innerText = "請輸入密碼";
-            return;
-        }
-        unlockNotes(pwd);
-    });
-    document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') document.getElementById('unlockBtn').click();
-    });
-
-    // ------------------- 筆記互動功能 (儲存、分析、測驗) -------------------
-    // 儲存功能使用 localStorage 保存學員個人數據
-    function saveToLocal(key, value) {
-        localStorage.setItem(`Gavin_User_${key}`, value);
-    }
-    function getFromLocal(key) {
-        return localStorage.getItem(`Gavin_User_${key}`) || "";
-    }
-
-    // 載入已儲存數據
-    function loadUserData() {
-        document.getElementById('painKnee').value = getFromLocal('painKnee');
-        document.getElementById('painBack').value = getFromLocal('painBack');
-        document.getElementById('painFoot').value = getFromLocal('painFoot');
-        document.getElementById('painNeck').value = getFromLocal('painNeck');
-        document.getElementById('footArch').value = getFromLocal('footArch') || "正常足弓";
-        document.getElementById('bunion').value = getFromLocal('bunion');
-        document.getElementById('shoeWear').value = getFromLocal('shoeWear') || "均勻磨損";
-        document.getElementById('gaitHeel').value = getFromLocal('gaitHeel') || "腳後跟先落地";
-        document.getElementById('gaitKnee').value = getFromLocal('gaitKnee') || "從不";
-        document.getElementById('testButt').value = getFromLocal('testButt') || "不會，屁股放鬆";
-        document.getElementById('hrChange').value = getFromLocal('hrChange');
-        document.getElementById('strategySelf').value = getFromLocal('strategySelf') || "踝策略";
-        document.getElementById('hrBefore').value = getFromLocal('hrBefore');
-        document.getElementById('hrAfter').value = getFromLocal('hrAfter');
-        document.getElementById('spo2').value = getFromLocal('spo2');
-        document.getElementById('stanceWidth').value = getFromLocal('stanceWidth') || "中距 (與肩同寬)";
-        document.getElementById('toeDir').value = getFromLocal('toeDir') || "朝前";
-        document.getElementById('rule1').value = getFromLocal('rule1') || "是";
-        document.getElementById('rule2').value = getFromLocal('rule2') || "是";
-        document.getElementById('rule3').value = getFromLocal('rule3') || "是";
-        document.getElementById('rule4').value = getFromLocal('rule4') || "是";
-        document.getElementById('standFwd').value = getFromLocal('standFwd') || "適中";
-        document.getElementById('standKnee').value = getFromLocal('standKnee') || "無";
-        document.getElementById('standHold').value = getFromLocal('standHold') || "否，自然呼氣";
-        document.getElementById('standSym').value = getFromLocal('standSym') || "是，對稱";
-        document.getElementById('standFeel').value = getFromLocal('standFeel');
-    }
-
-    function bindSaveButtons() {
-        document.getElementById('savePainBtn').onclick = () => {
-            saveToLocal('painKnee', document.getElementById('painKnee').value);
-            saveToLocal('painBack', document.getElementById('painBack').value);
-            saveToLocal('painFoot', document.getElementById('painFoot').value);
-            saveToLocal('painNeck', document.getElementById('painNeck').value);
-            alert("疼痛記錄已儲存");
-        };
-        document.getElementById('saveGaitBtn').onclick = () => {
-            saveToLocal('gaitHeel', document.getElementById('gaitHeel').value);
-            saveToLocal('gaitKnee', document.getElementById('gaitKnee').value);
-            alert("步態觀察已儲存");
-        };
-        document.getElementById('saveStrategyBtn').onclick = () => {
-            saveToLocal('testButt', document.getElementById('testButt').value);
-            saveToLocal('hrChange', document.getElementById('hrChange').value);
-            saveToLocal('strategySelf', document.getElementById('strategySelf').value);
-            const strategy = document.getElementById('strategySelf').value;
-            let advice = "";
-            if (strategy === "踝策略") advice = "✅ 良好！維持腳跟踩實，繼續保持。";
-            else if (strategy === "髖策略") advice = "⚠️ 髖策略主導，代表踝策略失靈。建議多練習腳跟踩實、放鬆臀部。";
-            else advice = "❌ 邁步策略警訊，踝策略嚴重失靈，優先重建腳底功能。";
-            document.getElementById('strategyAdvice').innerHTML = `🧾 ${advice}`;
-            alert("策略評估已儲存");
-        };
-        document.getElementById('saveZhanBtn').onclick = () => {
-            saveToLocal('hrBefore', document.getElementById('hrBefore').value);
-            saveToLocal('hrAfter', document.getElementById('hrAfter').value);
-            saveToLocal('spo2', document.getElementById('spo2').value);
-            saveToLocal('stanceWidth', document.getElementById('stanceWidth').value);
-            saveToLocal('toeDir', document.getElementById('toeDir').value);
-            const before = parseInt(document.getElementById('hrBefore').value) || 0;
-            const after = parseInt(document.getElementById('hrAfter').value) || 0;
-            const spo2v = parseInt(document.getElementById('spo2').value) || 0;
-            let analysis = "";
-            if (before>0 && after>0) {
-                const diff = after - before;
-                if (diff > 3) analysis += "⚠️ 心率上升，代表髖策略主導，腳跟未踩實。";
-                else if (diff < -2) analysis += "✅ 心率下降，副交感激活，站樁有效！";
-                else analysis += "📉 心率持平，可加強肋骨找恥骨增加呼氣效率。";
-            }
-            if (spo2v < 95 && spo2v>0) analysis += " ❗ 血氧偏低，死氣積累，優先練呼吸氣徹腳底。";
-            else if (spo2v >= 96) analysis += " ✔️ 血氧理想。";
-            document.getElementById('zhanAnalysis').innerHTML = `🧾 ${analysis}`;
-            alert("站樁數據已儲存");
-        };
-        document.getElementById('checkRulesBtn').onclick = () => {
-            const r1 = document.getElementById('rule1').value;
-            const r2 = document.getElementById('rule2').value;
-            const r3 = document.getElementById('rule3').value;
-            const r4 = document.getElementById('rule4').value;
-            let score = 0;
-            if (r1 === "是") score++;
-            if (r2 === "是") score++;
-            if (r3 === "是") score++;
-            if (r4 === "是") score++;
-            let msg = `四大金律達成 ${score}/4。`;
-            if (score === 4) msg += "完美！你已經掌握科技樁核心。";
-            else if (score >= 2) msg += "繼續加強未達成的項目。";
-            else msg += "建議從「腳跟踩實」開始重新練習。";
-            document.getElementById('rulesResult').innerHTML = `🧾 ${msg}`;
-            saveToLocal('rule1', r1); saveToLocal('rule2', r2); saveToLocal('rule3', r3); saveToLocal('rule4', r4);
-        };
-        document.getElementById('saveStandBtn').onclick = () => {
-            saveToLocal('standFwd', document.getElementById('standFwd').value);
-            saveToLocal('standKnee', document.getElementById('standKnee').value);
-            saveToLocal('standHold', document.getElementById('standHold').value);
-            saveToLocal('standSym', document.getElementById('standSym').value);
-            alert("站起評估已儲存");
-        };
-        document.getElementById('saveStandFeelBtn').onclick = () => {
-            saveToLocal('standFeel', document.getElementById('standFeel').value);
-            alert("練習筆記已儲存");
-        };
-    }
-
-    // 10題測驗
+    // 10 題神經偵探題庫 (題目, 選項, 正確答案索引, 解析)
     const quizData = [
-        { q: "1. 膝蓋痛的根本原因通常是？", options: ["膝蓋退化", "腳底失能導致力線斷裂", "股四頭肌不夠強"], correct: 1, explanation: "Gavin 解析：膝蓋是受害者，腳底失能（踝策略失效）導致膝被迫扭轉代償。" },
-        { q: "2. 站樁時心率不降反升，代表？", options: ["站得不夠久", "交感持續亢奮，髖策略主導", "有效練到心肺"], correct: 1, explanation: "錯！心率上升代表你仍卡在推進位，用肌肉死撐，沒啟動副交感。" },
-        { q: "3. 走路時哪個階段佔週期60%？", options: ["擺盪期", "支撐期", "雙腳支撐期"], correct: 1, explanation: "支撐期佔60%，是穩定的關鍵。" },
-        { q: "4. 腳的「剎車」部位是？", options: ["前腳掌", "腳後跟", "腳趾"], correct: 1, explanation: "腳後跟負責穩定、吸收衝擊，是身體的剎車。" },
-        { q: "5. 從坐到站，最主要的動力來自？", options: ["股四頭肌", "腹肌+臀肌", "小腿肌群"], correct: 1, explanation: "70%動力來自腹肌離心控制與臀肌向心收縮。" },
-        { q: "6. 啟動髖策略時，屁股會？", options: ["放鬆", "不自覺夾緊", "左右搖晃"], correct: 1, explanation: "髖策略 = 屁股夾緊，鎖死骶骨，抑制骨盆底肌。" },
-        { q: "7. 科技樁四大金律中最優先的是？", options: ["肋骨找恥骨", "腳跟踩實", "呼吸氣徹腳底"], correct: 1, explanation: "沒有腳跟踩實，就沒有煞車，後面全部是假動作。" },
-        { q: "8. 功能性扁平足的人，足弓扁是因為？", options: ["先天韌帶鬆弛", "脛骨外旋卡死，內側被迫壓扁", "走路太多"], correct: 1, explanation: "小腿卡在外旋位，大腦用膝內扣壓扁足弓來減震，視覺扁平但功能是高足弓。" },
-        { q: "9. 站起時憋氣會導致？", options: ["增加核心穩定", "腹內壓暴增，壓迫腰椎與骨盆底肌", "幫助站得更快"], correct: 1, explanation: "憋氣增加腹內壓，把腰椎往前推，骨盆底肌往下壓，長期導致腰痛、漏尿。" },
-        { q: "10. 哪種策略是最理想的穩定模式？", options: ["邁步策略", "髖策略", "踝策略"], correct: 2, explanation: "踝策略最省力、穩定，是健康步態的基礎。" }
+        { q: "1. 刷牙洗臉時腰酸，問題主要出在？", options: ["腰椎間盤突出", "髖關節夾擠", "踝策略失效，骨盆代償"], correct: 2, explanation: "Gavin 解析：踝策略失效，身體前傾時腳後跟煞不住，腰背肌肉被迫夾緊代償，跟腰椎無關！" },
+        { q: "2. 站樁時心率反而上升，代表？", options: ["站得不夠久", "交感持續亢奮，髖策略主導", "有效練到心肺"], correct: 1, explanation: "錯！站樁心率不降反升，代表你仍卡在「推進位」，用肌肉死撐，根本沒啟動副交感。" },
+        { q: "3. 關於「膝蓋是受害者」以下何者正確？", options: ["膝蓋天生脆弱", "腳底力線斷裂→膝被迫扭轉", "需要多練股四頭肌保護"], correct: 1, explanation: "膝蓋沒有自主權，腳底失衡（踝策略失靈）讓膝關節承受剪切力，練再多腿也無解。" },
+        { q: "4. 功能性扁平足的人，足弓為什麼看起來扁？", options: ["脛骨外旋卡死，內側被迫壓扁", "先天韌帶鬆弛", "走路太多"], correct: 0, explanation: "Gavin 版：小腿卡在外旋位，大腦用膝內扣壓扁足弓來減震，視覺扁平但功能是高足弓！" },
+        { q: "5. 「科技樁」四大金律中，哪一項最優先？", options: ["肋骨找恥骨", "屁股夾緊穩定", "腳跟踩實"], correct: 2, explanation: "腳跟踩實＝重建煞車，沒有煞車後面全部是假動作。心率降不下來，先練腳後跟。" },
+        { q: "6. 走路時骨盆過度左右搖晃，通常是？", options: ["髖關節外展肌群無力", "脊椎旋轉不足+髖策略失衡", "膝關節太鬆"], correct: 1, explanation: "傳動軸卡住，引擎（髖）只能用外展代償，搖晃幅度越大，神經耗能越高。" },
+        { q: "7. 為什麼練臀大肌太多反而容易漏尿、痔瘡？", options: ["臀大肌壓迫直腸", "臀大肌下束鎖死骶骨，抑制骨盆底肌上升", "體重變重"], correct: 1, explanation: "臀大肌下束→骶骨鎖死→骨盆底肌失去上升能力，內臟下沉。強臀不如先通踝。" },
+        { q: "8. 下列哪個是「邁步策略」過早啟用的警訊？", options: ["走路常絆倒", "站著不動時身體會自動想跨步", "膝蓋外側痛"], correct: 1, explanation: "踝+髖策略全崩，大腦只能靠前後跨步維持不摔，代表神經力學瀕臨失衡。" },
+        { q: "9. 哪一項是「神經性假代償」的特徵？", options: ["X光骨頭明顯歪斜", "閉眼單腳站不穩但外觀無異常", "矯正後馬上復發，但步態改變立即改善"], correct: 2, explanation: "骨頭沒壞，是大腦選了錯誤的力學路徑。調整步態，力線順了，歪斜自然消失。" },
+        { q: "10. 站樁時「肋骨找恥骨」主要作用？", options: ["練腹肌", "關閉肋骨外翻，啟動腹式呼氣，讓橫膈膜上升", "避免駝背"], correct: 1, explanation: "肋骨關閉才能讓橫膈膜有空間回彈，這是氣沉丹田的核心機械動作。" }
     ];
 
     function buildQuiz() {
         const container = document.getElementById('quizContainer');
-        if (!container) return;
         container.innerHTML = '';
         quizData.forEach((item, idx) => {
             const div = document.createElement('div');
             div.classList.add('quiz-item');
+            div.setAttribute('data-qidx', idx);
             div.innerHTML = `
                 <div class="quiz-question">${item.q}</div>
-                <div class="quiz-options">
+                <div class="quiz-options" id="quiz-${idx}">
                     ${item.options.map((opt, optIdx) => `
                         <label style="display:flex; gap:8px; align-items:center;">
                             <input type="radio" name="q${idx}" value="${optIdx}"> ${opt}
@@ -651,7 +366,7 @@
                     explanations.push(`❌ 第${i+1}題錯誤。${quizData[i].explanation}`);
                 }
             } else {
-                explanations.push(`⚠️ 第${i+1}題未作答 — ${quizData[i].explanation.substring(0, 60)}...`);
+                explanations.push(`⚠️ 第${i+1}題未作答 — 漏掉關鍵線索：${quizData[i].explanation.substring(0, 80)}...`);
             }
         }
         return { score, explanations };
@@ -663,21 +378,37 @@
         let gradeMsg = '';
         if (score >= 8) gradeMsg = '🧠 神經偵探大師級！你已經能用 Gavin 視角看身體。';
         else if (score >= 5) gradeMsg = '🕵️‍♂️ 具備偵探潛力，再多觀察「踝策略」與代償鏈。';
-        else gradeMsg = '📡 神經力學尚待校準，回頭複習「腳跟煞車」與站樁章節。';
+        else gradeMsg = '📡 神經力學尚待校準，回頭複習「腳跟煞車」與「真假X型腿」章節。';
         const resultHtml = `<strong>得分：${score} / ${total}</strong><br>${gradeMsg}<br><br>` + 
             explanations.map(e => `<div class="insight" style="margin-top:6px;">${e}</div>`).join('');
         document.getElementById('quizResult').innerHTML = resultHtml;
     });
 
-    // 初始化
-    loadUserData();
-    bindSaveButtons();
-    buildQuiz();
+    // 神經力學數據儲存模擬與分析
+    document.getElementById('saveNeuroBtn').addEventListener('click', () => {
+        const hrBefore = parseInt(document.getElementById('hrBefore').value) || 0;
+        const hrAfter = parseInt(document.getElementById('hrAfter').value) || 0;
+        const spo2 = parseInt(document.getElementById('spo2').value) || 0;
+        const重心 = document.getElementById('重心').value;
+        const strategy = document.getElementById('strategy').value;
 
-    // 自動載入站樁分析提示
-    if (document.getElementById('hrBefore').value || document.getElementById('hrAfter').value) {
-        document.getElementById('saveZhanBtn').click();
-    }
+        let analysis = '';
+        if (hrBefore > 0 && hrAfter > 0) {
+            const diff = hrAfter - hrBefore;
+            if (diff > 3) analysis += `⚠️ 站樁後心率上升 ${diff} bpm，代表「髖策略主導」，腳跟未煞車，氣不沉。`;
+            else if (diff < -2) analysis += `✅ 心率下降，副交感激活，科技樁有效！腳跟踩實成功。`;
+            else analysis += `📉 心率持平，可能剛入門，需強化「肋骨找恥骨」增加呼氣效率。`;
+        } else analysis += `💡 請填入站前/站後心率，才能精準分析煞車效能。`;
+
+        if (spo2 < 95 && spo2 > 0) analysis += ` ❗ 血氧偏低 (${spo2}%)，死氣積累，氣未循環，優先練「呼吸氣徹腳底」。`;
+        else if (spo2 >= 96) analysis += ` ✔️ 血氧理想，氧氣交換不錯。`;
+
+        analysis += ` 重心偏向${重心}，${strategy}主導。若「髖策略」在不該出現的場景啟用，則膝蓋、腰背皆代償。`;
+
+        document.getElementById('neuroResult').innerHTML = `🧾 神經力學解讀：${analysis}`;
+    });
+
+    buildQuiz();
 </script>
 </body>
 </html>
