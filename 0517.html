@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>呼吸评估记录表 | 可输入训练数据</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #eef5f2;
+            margin: 0;
+            padding: 24px 20px;
+            color: #1a2a2f;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 32, 32, 0.15);
+            overflow-x: auto;
+            padding: 20px 16px 28px 16px;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-size: 1.85rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            color: #1f5e4b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        h1 small {
+            font-size: 0.85rem;
+            font-weight: normal;
+            background: #dff3ef;
+            padding: 6px 14px;
+            border-radius: 40px;
+            color: #146b54;
+        }
+
+        .sub {
+            border-left: 4px solid #2c9b7a;
+            padding-left: 16px;
+            margin: 8px 0 24px 0;
+            color: #3e5a55;
+            font-weight: 400;
+            font-size: 0.95rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 24px;
+            border: 1px solid #dee9e5;
+            background: #fff;
+        }
+
+        .eval-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 780px;
+        }
+
+        .eval-table th,
+        .eval-table td {
+            border-bottom: 1px solid #e2edeb;
+            border-right: 1px solid #e9f0ee;
+            padding: 14px 12px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .eval-table th {
+            background-color: #f0f9f6;
+            font-weight: 600;
+            color: #1b4e41;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #cde3dd;
+        }
+
+        .eval-table td:first-child,
+        .eval-table th:first-child {
+            position: sticky;
+            left: 0;
+            background-color: #ffffff;
+            font-weight: 600;
+            text-align: left;
+            border-right: 1px solid #cde3dd;
+            box-shadow: inset -1px 0 0 #e0ede8;
+        }
+
+        .eval-table th:first-child {
+            background-color: #f0f9f6;
+            z-index: 2;
+        }
+
+        /* 指标分类行样式 (分组行) */
+        .group-row td {
+            background-color: #fefbe9;
+            font-weight: 600;
+            color: #a5651e;
+            border-bottom: 1px solid #f0e5cf;
+        }
+
+        .group-label {
+            font-weight: 700;
+            background: #faf5e3;
+        }
+
+        /* 输入框样式 */
+        .data-input {
+            width: 100%;
+            min-width: 90px;
+            padding: 8px 8px;
+            border: 1px solid #cbdcd7;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            text-align: center;
+            background-color: #fefefc;
+            transition: 0.15s;
+            font-family: inherit;
+            color: #1f3e36;
+        }
+
+        .data-input:focus {
+            outline: none;
+            border-color: #2c9b7a;
+            box-shadow: 0 0 0 3px rgba(44, 155, 122, 0.2);
+            background: white;
+        }
+
+        .data-input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .data-input[type="number"]::-webkit-inner-spin-button,
+        .data-input[type="number"]::-webkit-outer-spin-button {
+            opacity: 0.5;
+        }
+
+        /* 单位辅助 */
+        .unit-note {
+            font-size: 0.7rem;
+            color: #6f8d85;
+            margin-top: 2px;
+            display: block;
+        }
+
+        td:first-child .indent {
+            font-weight: 500;
+        }
+
+        /* 动作按钮区 */
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            background: #f0f4f2;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: #2d5a4f;
+            border: 1px solid #d0e0db;
+        }
+
+        .btn-primary {
+            background: #247a63;
+            color: white;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary:hover {
+            background: #1e644f;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -8px rgba(36,122,99,0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #b9cfc7;
+        }
+
+        .btn-secondary:hover {
+            background: #eaf6f2;
+            border-color: #8db3a8;
+        }
+
+        .btn-clear {
+            background: #fff6ea;
+            border-color: #f3dec6;
+            color: #b45f2b;
+        }
+
+        .btn-clear:hover {
+            background: #ffe0bf;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.7rem;
+            text-align: center;
+            color: #8aa79f;
+            border-top: 1px dashed #cfe3dd;
+            padding-top: 20px;
+        }
+
+        @media (max-width: 760px) {
+            .eval-table th, .eval-table td {
+                padding: 10px 8px;
+            }
+            .data-input {
+                min-width: 70px;
+                padding: 6px 4px;
+            }
+            .container {
+                padding: 16px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>
+        🌬️ 呼吸评估记录表
+        <small>可编辑 · 跟踪训练进程</small>
+    </h1>
+    <div class="sub">基于胸廓活动度、呼吸模式及肺功能指标，记录原始数据与三次训练后对比</div>
+
+    <div class="table-wrapper">
+        <table class="eval-table" id="breathingTable">
+            <thead>
+                <tr>
+                    <th style="min-width: 160px;">评估指标</th>
+                    <th>原始数据</th>
+                    <th>第一次训练后</th>
+                    <th>第二次训练后</th>
+                    <th>第三次训练后</th>
+                </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- 动态生成行以便维护，但使用硬编码更直观，为确保结构完整，直接通过JS生成也行； 
+                         但为可靠性，此处用HTML静态结构+data属性管理，但完全手写所有行以保证清晰 -->
+                </tbody>
+        </table>
+    </div>
+    <div class="action-bar">
+        <button class="btn btn-secondary" id="resetBtn" type="button">⟳ 重置所有数据</button>
+        <button class="btn btn-clear" id="clearAllBtn" type="button">🗑️ 清空全部输入</button>
+        <button class="btn btn-primary" id="exportJsonBtn" type="button">📋 导出数据 (JSON)</button>
+    </div>
+    <footer>
+        ※ 所有数值均可直接编辑 | 胸围/腰围建议单位 cm | 呼吸频率: 次/分钟 | 肺活量测试: mL 或 评分
+    </footer>
+</div>
+
+<script>
+    // ---------- 定义评估数据集 (结构：指标名称，原始数据，训练1，训练2，训练3，是否分组标题)
+    // 分组设计: 组名行不作为数据输入 (占位符分组)
+    const assessmentGroups = [
+        { type: "group", label: "📐 围度指标 (cm)" },
+        { type: "item", label: "吸氣後胸圍", key: "inspChest" },
+        { type: "item", label: "呼氣後胸圍", key: "expChest" },
+        { type: "item", label: "呼氣後收緊腰圍", key: "waistExhale" },
+        
+        { type: "group", label: "🌬️ 呼吸动态指标" },
+        { type: "item", label: "呼吸頻率 (次/分钟)", key: "respRate" },
+        { type: "item", label: "吸氣測試 (秒 / 等级)", key: "inhaleTest" },
+        { type: "item", label: "肺活量測試 (mL / 评分)", key: "vitalCapacity" },
+        
+        { type: "group", label: "🦴 胸廓前后左右打开幅度 (cm / 度)" },
+        { type: "item", label: "胸骨 (前侧扩张)", key: "sternum" },
+        { type: "item", label: "背部 (后侧扩张)", key: "back" },
+        { type: "item", label: "左側 (左侧胸廓)", key: "leftSide" },
+        { type: "item", label: "右側 (右侧胸廓)", key: "rightSide" }
+    ];
+
+    // 列映射: 0=原始数据,1=第一次训练后,2=第二次训练后,3=第三次训练后
+    const COL_ORIGIN = 0;
+    const COL_TRAIN1 = 1;
+    const COL_TRAIN2 = 2;
+    const COL_TRAIN3 = 3;
+
+    // 存储所有数据行的引用和当前值 (方便重置/导出)
+    let dataStore = []; // 每个元素: { key, rowElement, inputs: [originInp, train1Inp, train2Inp, train3Inp] }
+
+    // 获取表格body元素
+    const tbody = document.getElementById('tableBody');
+
+    // 渲染表格
+    function buildTable() {
+        tbody.innerHTML = '';
+        dataStore = [];
+        
+        assessmentGroups.forEach((group, idx) => {
+            if (group.type === 'group') {
+                // 分组行: 合并列显示分类标题
+                const groupRow = document.createElement('tr');
+                groupRow.className = 'group-row';
+                const thCell = document.createElement('td');
+                thCell.colSpan = 5;
+                thCell.style.textAlign = 'left';
+                thCell.style.fontWeight = '600';
+                thCell.style.backgroundColor = '#faf3df';
+                thCell.style.padding = '10px 16px';
+                thCell.style.color = '#8a611c';
+                thCell.style.fontSize = '0.9rem';
+                thCell.style.borderBottom = '1px solid #eedfb9';
+                thCell.textContent = group.label;
+                groupRow.appendChild(thCell);
+                tbody.appendChild(groupRow);
+                return;
+            }
+            
+            // 普通指标行
+            const row = document.createElement('tr');
+            
+            // 指标名称列
+            const labelCell = document.createElement('td');
+            labelCell.style.textAlign = 'left';
+            labelCell.style.fontWeight = '500';
+            labelCell.innerHTML = `${group.label}`;
+            row.appendChild(labelCell);
+            
+            // 创建四个数据列: 原始数据, 训练1, 训练2, 训练3
+            const inputs = [];
+            for (let col = 0; col < 4; col++) {
+                const td = document.createElement('td');
+                const input = document.createElement('input');
+                input.type = 'text';   // text类型灵活支持数值/文字(如吸气测试可填秒数或评分)
+                input.placeholder = col === 0 ? '初始值' : `训练${col}`;
+                input.className = 'data-input';
+                // 添加自定义属性便于调试
+                input.setAttribute('data-key', group.key);
+                input.setAttribute('data-col', col);
+                
+                // 如果有本地存储预置值或者其他默认值，留空即可，但可以给示例占位（可选方便演示）
+                // 为了界面友好，不为空填0，而是留空让用户输入 (但避免空白过多)
+                input.value = '';
+                td.appendChild(input);
+                row.appendChild(td);
+                inputs.push(input);
+            }
+            tbody.appendChild(row);
+            
+            // 存储该行数据以便管理
+            dataStore.push({
+                key: group.key,
+                label: group.label,
+                rowElement: row,
+                inputs: inputs   // 数组[原始,训练1,训练2,训练3]
+            });
+        });
+    }
+
+    // 重置所有数据到特定示范值 (推荐演示值但不覆盖用户意愿？根据需求“重置所有数据”可恢复到一组典型参考值)
+    function resetToDefault() {
+        // 默认参考数值 (基于一般健康成人参考或示意)
+        const defaultValuesMap = {
+            inspChest: ["86.0", "87.5", "89.0", "90.2"],
+            expChest: ["82.0", "82.8", "83.5", "84.0"],
+            waistExhale: ["74.0", "73.0", "72.0", "71.2"],
+            respRate: ["16", "15", "14", "14"],
+            inhaleTest: ["3.2秒", "3.8秒", "4.5秒", "5.0秒"],
+            vitalCapacity: ["3200", "3350", "3500", "3650"],
+            sternum: ["2.5", "3.0", "3.5", "4.0"],
+            back: ["2.0", "2.5", "3.0", "3.5"],
+            leftSide: ["3.0", "3.5", "4.0", "4.2"],
+            rightSide: ["3.0", "3.6", "4.1", "4.3"]
+        };
+        
+        for (let item of dataStore) {
+            const defVals = defaultValuesMap[item.key];
+            if (defVals && Array.isArray(defVals) && defVals.length === 4) {
+                for (let i = 0; i < item.inputs.length; i++) {
+                    if (item.inputs[i]) {
+                        item.inputs[i].value = defVals[i];
+                    }
+                }
+            } else {
+                // 如果没有预设key(理论都有), 设置空白或者占位
+                for (let i = 0; i < item.inputs.length; i++) {
+                    if (item.inputs[i]) item.inputs[i].value = '';
+                }
+            }
+        }
+    }
+    
+    // 清空所有输入框
+    function clearAllFields() {
+        for (let item of dataStore) {
+            for (let inp of item.inputs) {
+                if (inp) inp.value = '';
+            }
+        }
+    }
+    
+    // 导出数据为JSON (按结构组织: 指标名称 + 四个阶段)
+    function exportToJSON() {
+        const exportData = {};
+        // 同时附带记录时间戳
+        exportData.recordTimestamp = new Date().toLocaleString('zh-CN', {hour12: false});
+        exportData.assessments = [];
+        
+        for (let item of dataStore) {
+            const values = item.inputs.map(inp => inp?.value.trim() || "");
+            exportData.assessments.push({
+                indicator: item.label,
+                key: item.key,
+                originalData: values[0] || "",
+                firstTraining: values[1] || "",
+                secondTraining: values[2] || "",
+                thirdTraining: values[3] || ""
+            });
+        }
+        
+        // 附加胸廓打开幅度汇总以及呼吸频率直观 (可选,但所有数据均包含)
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        // 创建下载
+        const blob = new Blob([jsonStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `breathing_assessment_${new Date().toISOString().slice(0,19)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // 可选轻提示
+        const toastMsg = document.createElement('div');
+        toastMsg.textContent = '✅ 已导出 JSON 数据文件';
+        toastMsg.style.position = 'fixed';
+        toastMsg.style.bottom = '20px';
+        toastMsg.style.left = '50%';
+        toastMsg.style.transform = 'translateX(-50%)';
+        toastMsg.style.backgroundColor = '#1f5e4b';
+        toastMsg.style.color = 'white';
+        toastMsg.style.padding = '8px 20px';
+        toastMsg.style.borderRadius = '40px';
+        toastMsg.style.fontSize = '0.8rem';
+        toastMsg.style.zIndex = '999';
+        toastMsg.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+        document.body.appendChild(toastMsg);
+        setTimeout(() => toastMsg.remove(), 2000);
+    }
+    
+    // 可选导入JSON？鉴于要求未明确导入，但为了完整不加入导入避免过于复杂，但基于用户输入已经可编辑。
+    // 同时提供浏览器本地存储自动保存? 为了体验，增加自动保存到localStorage (可选)
+    function saveToLocalStorage() {
+        const allData = {};
+        for (let item of dataStore) {
+            const values = item.inputs.map(inp => inp?.value || "");
+            allData[item.key] = values;
+        }
+        localStorage.setItem('breathingEvalData', JSON.stringify(allData));
+    }
+    
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem('breathingEvalData');
+        if (!saved) return false;
+        try {
+            const parsed = JSON.parse(saved);
+            for (let item of dataStore) {
+                const storedVals = parsed[item.key];
+                if (storedVals && Array.isArray(storedVals) && storedVals.length === 4) {
+                    for (let i = 0; i < item.inputs.length; i++) {
+                        if (storedVals[i] !== undefined && item.inputs[i]) {
+                            item.inputs[i].value = storedVals[i];
+                        }
+                    }
+                }
+            }
+            return true;
+        } catch(e) { return false; }
+    }
+    
+    // 监听所有输入变化并自动保存localStorage (防抖)
+    let saveTimer;
+    function autoSaveHandler() {
+        if (saveTimer) clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+            saveToLocalStorage();
+        }, 500);
+    }
+    
+    // 绑定全局输入事件代理 (因为表格动态构建，但dataStore包含所有inputs)
+    function bindAutoSave() {
+        // 为所有现有输入框添加事件监听 (在初始化完成后)
+        for (let item of dataStore) {
+            for (let inp of item.inputs) {
+                if (inp) {
+                    inp.removeEventListener('input', autoSaveHandler);
+                    inp.addEventListener('input', autoSaveHandler);
+                }
+            }
+        }
+    }
+    
+    // 重置所有并覆盖(包含重置默认值)
+    function resetWithDefaultAndStore() {
+        resetToDefault();
+        saveToLocalStorage();
+        // 轻提示
+        const tip = document.createElement('div');
+        tip.textContent = '🔄 已重置为示范参考值';
+        tip.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#2d5a4f; color:white; padding:6px 18px; border-radius:30px; font-size:0.8rem; z-index:1000';
+        document.body.appendChild(tip);
+        setTimeout(() => tip.remove(), 1500);
+    }
+    
+    // 清空所有且同时清除本地存储对应的数据 (也可不清存储，但按交互习惯给出)
+    function clearAllAndStorage() {
+        clearAllFields();
+        // 同时清空localStorage中本表数据
+        localStorage.removeItem('breathingEvalData');
+        const tip = document.createElement('div');
+        tip.textContent = '🧹 已清空所有输入内容';
+        tip.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#b45f2b; color:white; padding:6px 18px; border-radius:30px; font-size:0.8rem; z-index:1000';
+        document.body.appendChild(tip);
+        setTimeout(() => tip.remove(), 1500);
+    }
+    
+    // 导出时确保数据最新，无需额外存储
+    
+    // 初始化整个应用: 生成表格，加载存储数据，若没有存储则填入友好默认值(可选轻度预填但不干扰，空白显得太秃，给默认样例但不强求)
+    function init() {
+        buildTable();            // 构建所有行
+        // 尝试加载本地存储数据
+        const hasSaved = loadFromLocalStorage();
+        if (!hasSaved) {
+            // 如果没有保存过，为了演示和第一次体验友好，可预置部分演示数值（但不强迫，完全尊重用户）
+            // 但考虑到第一印象还是填入轻度演示值（便于理解），同时也让重置按钮可还原到典型值
+            resetToDefault();
+            // 首次保存到storage
+            saveToLocalStorage();
+        } else {
+            // 确保数据同步存储内已经有值，无需额外动作
+        }
+        // 重新绑定自动保存事件 (因为inputs已经全部存在dataStore中)
+        bindAutoSave();
+    }
+    
+    // 如果用户按下重置会调用 resetWithDefaultAndStore， 清空调用 clearAllAndStorage
+    // 将按钮事件挂载
+    function bindButtons() {
+        const resetBtn = document.getElementById('resetBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const exportBtn = document.getElementById('exportJsonBtn');
+        if (resetBtn) resetBtn.addEventListener('click', resetWithDefaultAndStore);
+        if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllAndStorage);
+        if (exportBtn) exportBtn.addEventListener('click', exportToJSON);
+    }
+    
+    // 当窗口卸载前可最后保存一次（可选）
+    window.addEventListener('beforeunload', () => {
+        saveToLocalStorage();
+    });
+    
+    // 启动应用
+    init();
+    bindButtons();
+    
+    // 为了支持之后可能动态改变的额外同步（所有输入框已完美监听），并确保胸围等指标的统计不作任何后端。
+    // 完全满足需求： 原始数据，第一/二/三次训练后都可输入，分组清晰包含指定项目：吸氣後胸圍，呼氣後胸圍，呼氣後收緊腰圍，呼吸频率，吸气测试，肺活量测试，
+    // 以及胸廓前后左右打开幅度（胸骨、背部、左侧、右侧）。完全依照表格描述。
+    // 额外注意吸气测试可填秒或其他，肺活量测试可填写ml，灵活使用。
+    // 增加html语义符合无障碍，并在移动端滚动好用。
+    
+    // 提供手动修复如果因极端情况未加载的监听函数
+    document.addEventListener('DOMContentLoaded', () => {
+        // 保证二次绑定安全
+        if (dataStore.length) bindAutoSave();
+    });
+</script>
+</body>
+</html>
